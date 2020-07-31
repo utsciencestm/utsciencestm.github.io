@@ -104,7 +104,7 @@ Received Traveling Award +2
 
   <div class="container">
     <!-- Content here -->
-    <form onchange="updateText()">
+    <form onchange="addPeopleAbove()">
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Step 1. </strong> Fill in the form one by one. <br/>
         <strong>Step 2. </strong> Copy the generated text. <br/>
@@ -239,8 +239,8 @@ Received Traveling Award +2
       <br>
       <!-- <input type="text" value="Hello World" id="myInput"> -->
       <div class="my_tooltip">
-        <button onclick="copy_text(); return false;" onmouseout="outFunc()" class="btn-primary btn">
-          <span class="my_tooltiptext" id="myTooltip">Copy to clipboard</span>
+        <button onclick="updateText(); copy_text(); return false;" onmouseout="outFunc()" class="btn-primary btn">
+          <span class="my_tooltiptext" id="myTooltip">Generate and copy to clipboard</span>
           Copy text
         </button>
         <!-- TODO: new memeber event -->
@@ -332,21 +332,15 @@ Received Traveling Award +2
 
   <script>
     function addPeopleAbove() {
-      $("select#names option").each(function(){
-        let score = 0;
-        let v = $(this).val()
-        if ($('#attendingSocial').val().indexOf(v)!= -1 || 
-            $('#preparedSpeeches').val().indexOf(v)!= -1 || 
-            $('#tableTopics').val().indexOf(v)!= -1 ||
-            $('#evaluator').val().indexOf(v)!= -1 ||
-            $('#travelingAward').val().indexOf(v)!= -1
-            )
-          { 
-            // console.log(v);
-            $('select#participants option[value='+v+']').attr('selected','selected');
-          }
-          $('#participants').multiselect('rebuild');
-      });
+      function addThis(element) {  // , index, array
+        $('select#participants option[value='+element+']').attr('selected','selected');
+      }
+      $('#attendingSocial').val().forEach(addThis);
+      $('#preparedSpeeches').val().forEach(addThis);
+      $('#tableTopics').val().forEach(addThis);
+      $('#evaluator').val().forEach(addThis);
+      addThis($('#travelingAward').val());
+      $('#participants').multiselect('rebuild');
     }
     function updateSelect(source, target) {
       $(target).html($(source).html()+'<option value="NA"> NA </option>');
@@ -415,7 +409,7 @@ Received Traveling Award +2
 
     function outFunc() {
       var my_tooltip = document.getElementById("myTooltip");
-      my_tooltip.innerHTML = "Copy to clipboard";
+      my_tooltip.innerHTML = "Generate and copy to clipboard";
     }
   </script>
 
