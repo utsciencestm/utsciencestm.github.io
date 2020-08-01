@@ -256,6 +256,7 @@ Received Traveling Award +2
   <div class="col-md-6" style="display:none">
     <select id="names">
       <option value="Abel"> Abel</option>
+      <option value="Abinav"> Abinav </option>
       <option value="Aditya"> Aditya</option>
       <option value="Akankshi"> Akankshi</option>
       <option value="Aldanah"> Aldanah</option>
@@ -281,6 +282,7 @@ Received Traveling Award +2
       <option value="Omid"> Omid</option>
       <option value="Randall"> Randall</option>
       <option value="Reem"> Reem</option>
+      <option value="Riya"> Riya</option>
       <option value="Saadallah"> Saadallah</option>
       <option value="Sai"> Sai</option>
       <option value="Sarah"> Sarah</option>
@@ -290,6 +292,7 @@ Received Traveling Award +2
       <option value="Wahab"> Wahab</option>
       <option value="Zhen"> Zhenqiang</option>
       <option value="Zed"> Zed</option>
+      <option value="Zoe"> Zoe</option>
 <!--       <option value="Abel"> Abel Abraham Philips </option>
       <option value="Aditya"> Aditya Ojha </option>
       <option value="Akankshi"> Akankshi Manish Mody, IP1 </option>
@@ -349,26 +352,27 @@ Received Traveling Award +2
     function updateText() {
       addPeopleAbove();
       let s = $('#bestSpeaker').val();
-      s += '\t' + $('#bestTableTopics').val();
-      s += '\t' + $('#bestEvaluator').val();
-      s += '\t' + $('#travelingAward').val();
+      s += '\n' + $('#bestTableTopics').val() + '\t';
+      s += '\n' + $('#bestEvaluator').val() +'\t';
+      s += '\n' + $('#travelingAward').val() +'\t';
 
       $("select#names option").each(function(){
         // console.log($(this).val())
         let score = 0;
+        let reason = '';
         let v = $(this).val()
-        if ($('#attendingSocial').val().indexOf(v)!= -1) { score += 1; }
-        if ($('#preparedSpeeches').val().indexOf(v)!= -1) { score += 2; }
-        if ($('#tableTopics').val().indexOf(v)!= -1) { score += 1; }
-        if ($('#evaluator').val().indexOf(v)!= -1) { score += 1; }
-        if ($('#bestSpeaker').val().indexOf(v)!= -1) { score += 3; }
-        if ($('#bestTableTopics').val().indexOf(v)!= -1) { score += 2; }
-        if ($('#bestEvaluator').val().indexOf(v)!= -1) { score += 2; }
-        if ($('#travelingAward').val().indexOf(v)!= -1) { score += 2; }
-        if ($('#participants').val().indexOf(v)!= -1) { score += 1; }
-        if ($('#earlyTMSignUp').val().indexOf(v)!= -1) { score += 1; }
-        if ($('#memberSignUp').val().indexOf(v)!= -1) { score += 4; }
-        s += '\t' + score;
+        if ($('#attendingSocial').val().indexOf(v)!= -1) { score += 1; reason += 'attendingSocial,'; }
+        if ($('#preparedSpeeches').val().indexOf(v)!= -1) { score += 2; reason += 'preparedSpeeches,'; }
+        if ($('#tableTopics').val().indexOf(v)!= -1) { score += 1; reason += 'tableTopics,'; }
+        if ($('#evaluator').val().indexOf(v)!= -1) { score += 1; reason += 'evaluator,'; }
+        if ($('#bestSpeaker').val().indexOf(v)!= -1) { score += 3; reason += 'bestSpeaker,'; }
+        if ($('#bestTableTopics').val().indexOf(v)!= -1) { score += 2; reason += 'bestTableTopics,'; }
+        if ($('#bestEvaluator').val().indexOf(v)!= -1) { score += 2; reason += 'bestEvaluator,'; }
+        if ($('#travelingAward').val().indexOf(v)!= -1) { score += 2; reason += 'travelingAward,'; }
+        if ($('#participants').val().indexOf(v)!= -1) { score += 1; reason += 'participants,'; }
+        if ($('#earlyTMSignUp').val().indexOf(v)!= -1) { score += 1; reason += 'earlyTMSignUp,'; }
+        if ($('#memberSignUp').val().indexOf(v)!= -1) { score += 4; reason += 'memberSignUp,'; }
+        s += '\n' + score + '\t' + reason;
       });
 
       $('#myInput').val(s);
