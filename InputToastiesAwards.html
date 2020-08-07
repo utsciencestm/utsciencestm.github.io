@@ -26,9 +26,14 @@ Received Traveling Award +2
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+ 
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   <style>
+    .box { 
+      display:inline-block;
+      height: 100vh;
+    }
 
     .mt-100 {
       margin-top: 100px
@@ -102,7 +107,16 @@ Received Traveling Award +2
 
 <body>
 
-  <div class="container">
+
+
+
+  <div class="box ">
+    <!-- <iframe onload="this.width=0.4*screen.width;" src="./InputToastiesAwards.html" frameborder="0" scrolling="yes" height="100%vh" align="left"></iframe> -->
+
+
+ <!-- <div class="container" style="overflow-y: scroll; height:100%; width:38vw">  -->
+ <div class="container"> 
+  <!-- width:38vw -->
     <!-- Content here -->
     <form onchange="addPeopleAbove()">
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -113,6 +127,14 @@ Received Traveling Award +2
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" style="display: none;">Authorize</button>
+    <button id="signout_button" style="display: none;">Sign Out</button>
+
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+
 
       
 
@@ -288,6 +310,7 @@ Received Traveling Award +2
 
   <div class="col-md-6" style="display:none">
     <select id="names">
+      <!-- load from google sheets  -->
       <option value="Abel"> Abel</option>
       <option value="Abinav"> Abinav </option>
       <option value="Aditya"> Aditya</option>
@@ -326,6 +349,8 @@ Received Traveling Award +2
       <option value="Zhen"> Zhenqiang</option>
       <option value="Zed"> Zed</option>
       <option value="Zoe"> Zoe</option>
+
+
 <!--       <option value="Abel"> Abel Abraham Philips </option>
       <option value="Aditya"> Aditya Ojha </option>
       <option value="Akankshi"> Akankshi Manish Mody, IP1 </option>
@@ -364,7 +389,14 @@ Received Traveling Award +2
     </select>
   </div>
 
+  </div>
 
+  
+  <div class="box">
+    <!-- view only -->
+    <!-- <iframe onload="this.width=0.55*screen.width;" frameborder="0" scrolling="no" height="100%vh" align="left" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml?widget=true&amp;headers=false"></iframe> -->
+   <!--  <iframe onload="this.width=0.6*screen.width;" frameborder="0" scrolling="no" height="100%" align="left" src="https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/edit"></iframe> -->
+  </div>
 
   <script>
     function addPeopleAbove() {
@@ -384,10 +416,19 @@ Received Traveling Award +2
     }
     function updateText() {
       addPeopleAbove();
-      let s = $('#bestSpeaker').val();
-      s += '\n' + $('#bestTableTopics').val() + '\t';
-      s += '\n' + $('#bestEvaluator').val() +'\t';
-      s += '\n' + $('#travelingAward').val() +'\t';
+      let s = "";
+      // let s = $('#bestSpeaker').val();
+      // s += '\n' + $('#toastmaster').val() + '\t';
+      // s += '\n' + $('#topicsmaster').val() + '\t';
+      // s += '\n' + $('#participants').val() + '\t';
+      // s += '\n' + $('#bestEvaluator').val() +'\t';
+      // s += '\n' + $('#travelingAward').val() +'\t';
+
+
+      $('form select').each(function() {console.log($(this).val());
+        s += '\n' + $(this).val() +'\t';
+      } )
+
       s += '\n' + 'Meeting Points\tReason';
 
       $("select#names option").each(function(){
@@ -414,8 +455,9 @@ Received Traveling Award +2
 
       $('#myInput').val(s);
     }
-    $(document).ready(function() {
-      //copies all contents of myDropDownListDiv into anotherDiv
+
+    function init() { // call it after names are loaded
+//copies all contents of myDropDownListDiv into anotherDiv
       $("[class^=select]").append($("#names").html());
 
       new Choices('.selectLimit3', {
@@ -435,6 +477,10 @@ Received Traveling Award +2
       // after adding options
       $('#participants').multiselect();
       // $('#selectDropdowns #participants').multiselect({ buttonWidth:'100px',listWidth:'300px',maxHeight:'70vh' });
+    }
+
+    $(document).ready(function() {
+      init();
     });
 
     // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard2
@@ -452,8 +498,50 @@ Received Traveling Award +2
       var my_tooltip = document.getElementById("myTooltip");
       my_tooltip.innerHTML = "Generate and copy to clipboard";
     }
+
+
+    // read from google sheets 
+
+    /**
+     * Print the names and majors of students in a sample spreadsheet:
+     * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+     */
+    var names = [];
+    function listNames() {
+      gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4',
+        // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+        range: 'dontRenameMe!A17:100',
+      }).then(function(response) {
+        var range = response.result;
+        if (range.values.length > 0) {
+          // appendPre('Names:');
+          for (i = 0; i < range.values.length; i++) {
+            var row = range.values[i];
+            // Print columns A and E, which correspond to indices 0 and 4.
+            if (row[0] == "") {break;}
+            // appendPre(row[0]); // + ', ' + row[4]
+            let firstName = row[0].split(' ')[0];
+            names.push(firstName);
+            $('<option>').val(firstName).text(firstName).appendTo('#names');
+          }
+           init();
+        } else {
+          appendPre('No data found.');
+        }
+      }, function(response) {
+        appendPre('Error: ' + response.result.error.message);
+      });
+
+    }
+
   </script>
 
+    <script type="text/javascript"  src="js/googleSheets.js" ></script>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
 </body>
 
 </html>
