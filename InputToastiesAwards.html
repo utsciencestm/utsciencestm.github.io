@@ -114,16 +114,38 @@ Received Traveling Award +2
         </button>
       </div>
 
+      
+
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
+        <label for="inputPassword" class="col-sm-2 col-form-label">Toastmaster<span class="badge">+1</span></label>
         <div class="col-sm-10">
-          <select id="attendingSocial" class="selectMulti" multiple>
+          <select id="toastmaster" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
           </select>
         </div>
       </div>
 
-      <hr>
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Topicsmaster<span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="topicsmaster" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">General Evaluator<span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="generalEvaluator" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
 
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
@@ -231,6 +253,17 @@ Received Traveling Award +2
           </select>
         </div>
       </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="attendingSocial" class="selectMulti" multiple>
+          </select>
+        </div>
+      </div>
+
+      <hr>
 
       <!-- <div class="row d-flex justify-content-center mt-100"> -->
 
@@ -363,6 +396,9 @@ Received Traveling Award +2
         let reason = '';
         let v = $(this).val()
         if ($('#attendingSocial').val().indexOf(v)!= -1) { score += 1; reason += 'attendingSocial,'; }
+        if ($('#toastmaster').val().indexOf(v)!= -1) { score += 1; reason += 'toastmaster,'; }
+        if ($('#topicsmaster').val().indexOf(v)!= -1) { score += 1; reason += 'topicsmaster,'; }
+        if ($('#generalEvaluator').val().indexOf(v)!= -1) { score += 1; reason += 'generalEvaluator,'; }
         if ($('#preparedSpeeches').val().indexOf(v)!= -1) { score += 2; reason += 'preparedSpeeches,'; }
         if ($('#tableTopics').val().indexOf(v)!= -1) { score += 1; reason += 'tableTopics,'; }
         if ($('#evaluator').val().indexOf(v)!= -1) { score += 1; reason += 'evaluator,'; }
