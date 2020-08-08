@@ -1,13 +1,17 @@
 
+function addParticipant(element) {  // , index, array
+  $('select#participants option[value='+element+']').attr('selected','selected');
+}
 function addPeopleAbove() {
-  function addThis(element) {  // , index, array
-    $('select#participants option[value='+element+']').attr('selected','selected');
-  }
-  $('#attendingSocial').val().forEach(addThis);
-  $('#preparedSpeeches').val().forEach(addThis);
-  $('#tableTopics').val().forEach(addThis);
-  $('#evaluator').val().forEach(addThis);
-  addThis($('#travelingAward').val());
+  
+  $('#preparedSpeeches').val().forEach(addParticipant);
+  $('#tableTopics').val().forEach(addParticipant);
+  $('#evaluator').val().forEach(addParticipant);
+  addParticipant($('#travelingAward').val());
+  addParticipant($('#toastmaster').val());
+  addParticipant($('#topicsmaster').val());
+  addParticipant($('#generalEvaluator').val());
+  // time keeper, grammian... 
   $('#participants').multiselect('rebuild');
 }
 function updateSelect(source, target) {
@@ -53,24 +57,30 @@ function updateText() {
 
   $('#myInput').val(s);
 }
-
+var choices = {}
 function init() { // call it after names are loaded
 //copies all contents of myDropDownListDiv into anotherDiv
   $("[class^=select]").append($("#names").html());
 
-  new Choices('.selectLimit3', {
-    removeItemButton: true,
-    maxItemCount: 3,
-    searchResultLimit: 5,
-    renderChoiceLimit: 5
-  });
+  // new Choices('.selectLimit3', {
+  //   removeItemButton: true,
+  //   maxItemCount: 3,
+  //   searchResultLimit: 5,
+  //   renderChoiceLimit: 5
+  // });
 
-  var multipleCancelButton = new Choices('[class^=selectMulti]', {
-    removeItemButton: true,
-    // maxItemCount:5,
-    searchResultLimit: 5,
-    renderChoiceLimit: 5
-  });
+  // choices = new Choices('[class^=selectMulti]', {
+  //   removeItemButton: true,
+  //   // maxItemCount:5,
+  //   searchResultLimit: 5,
+  //   renderChoiceLimit: 5
+  // });
+  choices.preparedSpeeches = new Choices('#preparedSpeeches', {removeItemButton: true, searchResultLimit: 8, renderChoiceLimit: 3});
+  choices.tableTopics = new Choices('#tableTopics', {removeItemButton: true, searchResultLimit: 8, renderChoiceLimit: 10});
+  choices.evaluator = new Choices('#evaluator', {removeItemButton: true, searchResultLimit: 8, renderChoiceLimit: 3});
+  choices.earlyTMSignUp = new Choices('#earlyTMSignUp', {removeItemButton: true, searchResultLimit: 8});
+  choices.memberSignUp = new Choices('#memberSignUp', {removeItemButton: true, searchResultLimit: 8});
+  choices.attendingSocial = new Choices('#attendingSocial', {removeItemButton: true, searchResultLimit: 8});
 
   // after adding options
   $('#participants').multiselect();
@@ -124,6 +134,54 @@ function listNames() {
         $('<option>').val(firstName).text(firstName).appendTo('#names');
       }
        init();
+    } else {
+      appendPre('No data found.');
+    }
+  }, function(response) {
+    appendPre('Error: ' + response.result.error.message);
+  });
+
+}
+
+var range;
+function loadData(col) {
+  col = col.trim()
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4',
+    // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+    range: 'dontRenameMe!' + col + '2:15',
+  }).then(function(response) {
+    range = response.result;
+    if (range.values.length > 0) {
+    $('#toastmaster').val(range.values[0][0]);
+    $('#topicsmaster').val(range.values[1][0]);
+    $('#generalEvaluator').val(range.values[2][0]);
+
+    // $('#preparedSpeeches').val(range.values[3][0]);
+    // $('#tableTopics').val(range.values[4][0]);
+    // $('#evaluator').val(range.values[5][0]);
+    choices.preparedSpeeches.setValue(range.values[3][0].split(','));
+    choices.tableTopics.setValue(range.values[4][0].split(','));
+    choices.evaluator.setValue(range.values[5][0].split(','));
+
+    $('#preparedSpeeches')[0].onchange();
+    $('#tableTopics')[0].onchange();
+    $('#evaluator')[0].onchange();
+
+    $('#bestSpeaker').val(range.values[6][0]);
+    $('#bestTableTopics').val(range.values[7][0]);
+    $('#bestEvaluator').val(range.values[8][0]);
+    $('#travelingAward').val(range.values[9][0]);
+    
+    range.values[10][0].split(',').forEach(addParticipant);
+    $('#participants').multiselect('rebuild');
+    
+    // $('#earlyTMSignUp').val(range.values[11][0]);
+    // $('#memberSignUp').val(range.values[12][0]);
+    // $('#attendingSocial').val(range.values[13][0]);
+    if (range.values[11]) {choices.earlyTMSignUp.setValue(range.values[11][0].split(','));}
+    if (range.values[12]) {choices.memberSignUp.setValue(range.values[12][0].split(','));}
+    if (range.values[13]) {choices.attendingSocial.setValue(range.values[13][0].split(','));}
     } else {
       appendPre('No data found.');
     }

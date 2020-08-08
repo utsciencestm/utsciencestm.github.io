@@ -78,8 +78,8 @@ Received Traveling Award +2
  <!-- <div class="container">  -->
   <!-- width:38vw -->
     <!-- Content here -->
-    <form onchange="addPeopleAbove()">
-      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.) 
          <!--Add buttons to initiate auth sequence and sign out-->
          <!-- href="/googleSheets.html" target="_blank"  -->
@@ -88,43 +88,53 @@ Received Traveling Award +2
         <pre id="content" style="white-space: pre-wrap;"></pre>
 
         <strong>Step 1. </strong> Fill in the form one by one. <br/>
-        <strong>Step 2. </strong> Copy the generated text. <br/>
+        <strong>Step 2. </strong> Click "Done" to copy the generated text. <br/>
         <strong>Step 3. </strong> Paste to the Google Sheet.
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
 
-      <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Toastmaster<span class="badge">+1</span></label>
-        <div class="col-sm-10">
-          <select id="toastmaster" class="select"> <!-- class="selectMulti" -->
-            <option value="NA"> NA </option>
-          </select>
-        </div>
-      </div>
+
+     Load data from column: <input type="text" id="meetingCol" name="meetingCol">
+        <button onclick="loadData($('#meetingCol').val()); return false;" class="btn-primary btn">
+         Load
+        </button>
+        <br><br>
+
+    <form onchange="addPeopleAbove()">
+      
+
 
       <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Topicsmaster<span class="badge">+1</span></label>
-        <div class="col-sm-10">
-          <select id="topicsmaster" class="select"> <!-- class="selectMulti" -->
-            <option value="NA"> NA </option>
-          </select>
+      	<div class="col-sm">
+	        <!-- best speaker select from one of three speakers -->
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Toastmaster<span class="badge">+1</span></label>
+	        <div class="col-sm-10">
+	          <select id="toastmaster" class="select"> <!-- class="selectMulti" -->
+	            <option value="NA"> NA </option>
+	          </select>
+	        </div>
         </div>
+		<div class="col-sm">
+	        <!-- best speaker select from one of three speakers -->
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Topicsmaster<span class="badge">+1</span></label>
+	        <div class="col-sm-10">
+	          <select id="topicsmaster" class="select"> <!-- class="selectMulti" -->
+	            <option value="NA"> NA </option>
+	          </select>
+	        </div>
+      	</div>
+		<div class="col-sm">
+	        <!-- best speaker select from one of three speakers -->
+	        <label for="inputPassword" class="col-sm-2 col-form-label">General Evaluator<span class="badge">+1</span></label>
+	        <div class="col-sm-10">
+	          <select id="generalEvaluator" class="select"> <!-- class="selectMulti" -->
+	            <option value="NA"> NA </option>
+	          </select>
+	        </div>
+      	</div>
       </div>
-
-      <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">General Evaluator<span class="badge">+1</span></label>
-        <div class="col-sm-10">
-          <select id="generalEvaluator" class="select"> <!-- class="selectMulti" -->
-            <option value="NA"> NA </option>
-          </select>
-        </div>
-      </div>
-
 
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
@@ -154,35 +164,36 @@ Received Traveling Award +2
       </div>
 
       <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Best Speaker <span class="badge">+3</span></label>
-        <div class="col-sm-10">
-          <select id='bestSpeaker'>
-            <option value="NA"> NA </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Best Table Topics <span class="badge">+2</span> </label>
-        <div class="col-sm-10">
-          <select id="bestTableTopics">
-            <!-- no person won, all disqualified -->
-            <option value="NA"> NA </option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Best Evaluator <span class="badge">+2</span></label>
-        <div class="col-sm-10">
-          <select id="bestEvaluator">
-            <option value="NA"> NA </option>
-          </select>
-        </div>
-      </div>
+      	<div class="col-sm">
+	        <!-- best speaker select from one of three speakers -->
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Best Speaker <span class="badge">+3</span></label>
+	        <div class="col-sm-10">
+	          <select id='bestSpeaker'>
+	            <option value="NA"> NA </option>
+	          </select>
+	        </div>
+	      </div>
+	     
+	      <div class="col-sm">
+		        <!-- best speaker select from one of three speakers -->
+		        <label for="inputPassword" class="col-sm-2 col-form-label">Best Table Topics <span class="badge">+2</span> </label>
+		        <div class="col-sm-10">
+		          <select id="bestTableTopics">
+		            <!-- no person won, all disqualified -->
+		            <option value="NA"> NA </option>
+		          </select>
+		      </div>
+	     </div>
+	      <div class="col-sm">
+		        <!-- best speaker select from one of three speakers -->
+		        <label for="inputPassword" class="col-sm-2 col-form-label">Best Evaluator <span class="badge">+2</span></label>
+		        <div class="col-sm-10">
+		          <select id="bestEvaluator">
+		            <option value="NA"> NA </option>
+		          </select>
+		      </div>
+		  </div>
+	  </div>
 
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
@@ -216,6 +227,8 @@ Received Traveling Award +2
       <hr>
 
       <div class="form-group row">
+        <div class="col-sm-10">
+
         <!-- best speaker select from one of three speakers -->
         <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span> </label>
         <div class="col-sm-10">
@@ -224,7 +237,8 @@ Received Traveling Award +2
         </div>
       </div>
 
-      <div class="form-group row">
+        <div class="col-sm-10">
+
         <!-- best speaker select from one of three speakers -->
         <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span> </label>
         <div class="col-sm-10">
@@ -233,27 +247,26 @@ Received Traveling Award +2
         </div>
       </div>
 
-      <div class="form-group row">
-        <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
         <div class="col-sm-10">
-          <select id="attendingSocial" class="selectMulti" multiple>
-          </select>
-        </div>
+	        <!-- best speaker select from one of three speakers -->
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
+	        <div class="col-sm-10">
+	          <select id="attendingSocial" class="selectMulti" multiple>
+	          </select>
+	        </div>
+	      </div>
       </div>
 
       <hr>
 
       <!-- <div class="row d-flex justify-content-center mt-100"> -->
-
-      <textarea id="myInput">Text will be generated here</textarea>
-
       <br>
       <!-- <input type="text" value="Hello World" id="myInput"> -->
-      <div class="my_tooltip">
+      <div class="my_tooltip d-flex justify-content-center">
+      	 <textarea id="myInput" style="display: block">Text will be generated here</textarea>
         <button onclick="updateText(); copy_text(); return false;" onmouseout="outFunc()" class="btn-primary btn">
           <span class="my_tooltiptext" id="myTooltip">Generate and copy to clipboard</span>
-          Copy text
+          Done
         </button>
         <!-- TODO: new memeber event -->
       </div>
