@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  margin: 0;
+  min-width: 250px;
+}
+
+/* Include the padding and border in an element's total width and height */
+* {
+  box-sizing: border-box;
+}
+
+/* Remove margins and padding from the list */
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the list items */
+ul li {
+  cursor: pointer;
+  position: relative;
+  padding: 12px 8px 12px 40px;
+  list-style-type: none;
+  background: #eee;
+  font-size: 18px;
+  transition: 0.2s;
+  
+  /* make the list items unselectable */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Set all odd list items to a different color (zebra-stripes) */
+ul li:nth-child(odd) {
+  background: #f9f9f9;
+}
+
+/* Darker background-color on hover */
+ul li:hover {
+  background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+ul li.checked {
+  background: #888;
+  color: #fff;
+  text-decoration: line-through;
+}
+
+/* Add a "checked" mark when clicked on */
+ul li.checked::before {
+  content: '';
+  position: absolute;
+  border-color: #fff;
+  border-style: solid;
+  border-width: 0 2px 2px 0;
+  top: 10px;
+  left: 16px;
+  transform: rotate(45deg);
+  height: 15px;
+  width: 7px;
+}
+
+/* Style the close button */
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 12px 16px 12px 16px;
+}
+
+.close:hover {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Style the header */
+.header {
+  background-color: #f44336;
+  padding: 30px 40px;
+  color: white;
+  text-align: center;
+}
+
+/* Clear floats after the header */
+.header:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Style the input */
+input, select {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  width: 50%;
+  padding: 10px;
+  float: left;
+  font-size: 16px;
+}
+
+/* Style the "Add" button */
+.addBtn {
+  padding: 10px;
+  /*width: 25%;*/
+  width: 30%;
+  background: #d9d9d9;
+  color: #555;
+  float: left;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 0;
+}
+
+.addBtn:hover {
+  background-color: #bbb;
+}
+</style>
+</head>
+<body>
+
+<div style="width: 100%; overflow: hidden;">
+    <div style="width: 40%; float: left;">
+    <div id="myDIV" class="header">
+  <h2 style="margin:5px">Check in</h2>
+  <!-- <input type="text" id="myInput" placeholder="Title..."> -->
+
+
+  <select id="myInput" name="myInput">
+      <option value="Abel">  Abel Abraham Philips  </option>
+      <option value="Aditya">  Aditya Ojha  </option>
+      <option value="Akankshi">  Akankshi Manish Mody, IP1  </option>
+      <option value="Aldanah">  Aldanah A Alqahtani  </option>
+      <option value="Amy">  Amy Nguyen  </option>
+      <option value="Arushi">  Arushi Guddanti, DL1  </option>
+      <option value="Austin">  Austin Kyler Morgan  </option>
+      <option value="Brennan">  Brennan Dubuc, CC  </option>
+      <option value="Chinedu">  Chinedu Enwere  </option>
+      <option value="Christopher">  Christopher C. Hsu  </option>
+      <option value="Eshani">  Eshani S Kaul  </option>
+      <option value="Jagannath">  Jagannath Swaminathan, ACB  </option>
+      <option value="Jason">  Jason Gene Cox  </option>
+      <option value="Jianing">  Jianing Lei  </option>
+      <option value="Jonathan">  Jonathan Garcia  </option>
+      <option value="Jose">  Jose Chavez  </option>
+      <option value="Kam">  Kam Knight  </option>
+      <option value="Karan">  Karan Palsani, PI1  </option>
+      <option value="Maanasa">  Maanasa Cherukuvada  </option>
+      <option value="Manar">  Manar Hasan, ACB  </option>
+      <option value="Manasa">  Manasa Kotamraju  </option>
+      <option value="Minh">  Minh L. Pham, MS2  </option>
+      <option value="Nitin">  Nitin Jain  </option>
+      <option value="Omid">  Omid Meh  </option>
+      <option value="Randall">  Randall Peyton  </option>
+      <option value="Reem">  Reem Alomar  </option>
+      <option value="Saadallah">  Saadallah Kassir, CL  </option>
+      <option value="Sai">  Sai Krishna Vogirala, IP1  </option>
+      <option value="Sarah">  Sarah Seraj, PI1  </option>
+      <option value="Sean">  Sean Trapp  </option>
+      <option value="Shubham">  Shubham Singh  </option>
+      <option value="Spencer">  Spencer Dee Gregory  </option>
+      <option value="Wahab">  Wahab Choudhry  </option>
+      <option value="Zhen">  Zhenqiang Ying   </option>
+      <option value="Zed">  Zed Yuan  </option>
+    </select>
+
+
+  <span onclick="newElement('social')" class="addBtn"> Social</span>
+  <span onclick="newElement('meeting')" class="addBtn"> Meeting</span>
+  <br>
+  <br>
+  <br>
+  <span onclick="newElement()" class="addBtn">Best Speaker</span>
+  <span onclick="newElement()" class="addBtn">Best Table Topics</span>
+  <span onclick="newElement()" class="addBtn">Best Evaluator</span>
+  <span onclick="newElement()" class="addBtn">Traveling Award</span>
+
+  </div>
+
+    <div>Attended Social<ul id="social"></ul></div>
+  <div>Attended Meeting<ul id="meeting"></ul></div>
+  <div>Best Speaker<ul id="meeting"></ul></div>
+  <ul id="myUL">
+  <!--   <li>Hit the gym</li>
+    <li class="checked">Pay bills</li>
+    <li>Meet George</li>
+    <li>Buy eggs</li>
+    <li>Read a book</li>
+    <li>Organize office</li> -->
+  </ul>
+
+</div>
+
+<!-- https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/edit?usp=sharing -->
+
+    <div style="margin-left: 40%;">
+        <!-- google sheet - file - publish  -->
+     <iframe style="width:100%; height:100vh" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml?widget=true&amp;headers=false"></iframe>
+    </div>
+</div>
+
+
+<script>
+// Create a "close" button and append it to each list item
+var myNodelist = document.getElementsByTagName("LI");
+var i;
+for (i = 0; i < myNodelist.length; i++) {
+  var span = document.createElement("SPAN");
+  var txt = document.createTextNode("\u00D7");
+  span.className = "close";
+  span.appendChild(txt);
+  myNodelist[i].appendChild(span);
+}
+
+// Click on a close button to hide the current list item
+var close = document.getElementsByClassName("close");
+var i;
+for (i = 0; i < close.length; i++) {
+  close[i].onclick = function() {
+    var div = this.parentElement;
+    div.style.display = "none";
+  }
+}
+
+// Add a "checked" symbol when clicking on a list item
+var list = document.querySelector('ul');
+list.addEventListener('click', function(ev) {
+  if (ev.target.tagName === 'LI') {
+    ev.target.classList.toggle('checked');
+  }
+}, false);
+
+// Create a new list item when clicking on the "Add" button
+function newElement(target) {
+  var li = document.createElement("li");
+  var inputValue = document.getElementById("myInput").value;
+  var t = document.createTextNode(inputValue);
+  li.appendChild(t);
+  if (inputValue === '') {
+    alert("You must write something!");
+  } else {
+    document.getElementById(target).appendChild(li);
+  }
+  document.getElementById("myInput").value = "";
+
+  var span = document.createElement("SPAN");
+  var txt = document.createTextNode("\u00D7");
+  span.className = "close";
+  span.appendChild(txt);
+  li.appendChild(span);
+
+  for (i = 0; i < close.length; i++) {
+    close[i].onclick = function() {
+      var div = this.parentElement;
+      div.style.display = "none";
+    }
+  }
+}
+</script>
+
+</body>
+</html>

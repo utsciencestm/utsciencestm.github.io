@@ -1,15 +1,366 @@
-<style>
-.box { display:inline-block;}
-</style>
+<!--
+Early TM sign-up +1 // before ending the previous meeting
 
-<body width="100%">
-  <div class="box">
-    <iframe onload="this.width=0.4*screen.width;" src="./InputToastiesAwards.html" frameborder="0" scrolling="yes" height="100%vh" align="left"></iframe>
+Attending Meeting	+1
+Attending Social +1
+
+Delivering Prepared Speech +2
+Delivering TT Speech	+1
+Delivering Evaluation	+1
+
+Member Sign-up +4
+Best Speaker	+3
+Best Table Topics	+2
+Best Evaluator +2
+Received Traveling Award +2
+
+# personal achievement system
+# achievement?=id=spiderman
+ -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  <style>
+    .box { 
+      display:inline-block;
+      height: 100vh;
+    }
+
+    .mt-100 {
+      margin-top: 100px
+    }
+
+    body {
+      /* background: #D3D3D3; */
+      /* background: -webkit-linear-gradient(to right, #F8F8F8, #D3D3D3); */
+      /* background: linear-gradient(to right, #F8F8F8, #D3D3D3); */
+      /* color: #000000; */
+      min-height: 100vh
+    }
+
+    /* #names {
+      width: 50%;
+      margin: auto;
+    } */
+
+    label {
+      min-width: 200px !important;
+      display: inline-block !important
+    }
+  </style>
+  <link rel="stylesheet" href="css/tooltip.css" type="text/css"/>
+  <link rel="stylesheet" href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0">
+  <script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
+  
+  <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
+  <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css"/>
+</head>
+
+<body>
+
+
+
+
+  <div class="box ">
+    <!-- <iframe onload="this.width=0.4*screen.width;" src="./InputToastiesAwards.html" frameborder="0" scrolling="yes" height="100%vh" align="left"></iframe> -->
+
+
+ <div class="container" style="overflow-y: scroll; height:100%; width:38vw"> 
+ <!-- <div class="container">  -->
+  <!-- width:38vw -->
+    <!-- Content here -->
+    <form onchange="addPeopleAbove()">
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.) 
+         <!--Add buttons to initiate auth sequence and sign out-->
+         <!-- href="/googleSheets.html" target="_blank"  -->
+        <a class="btn btn-sm btn-light" id="authorize_button" style="display: none;">Authorize</a>
+        <a class="btn btn-sm btn-light" id="signout_button" style="display: none;">Sign Out</a>
+        <pre id="content" style="white-space: pre-wrap;"></pre>
+
+        <strong>Step 1. </strong> Fill in the form one by one. <br/>
+        <strong>Step 2. </strong> Copy the generated text. <br/>
+        <strong>Step 3. </strong> Paste to the Google Sheet.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Toastmaster<span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="toastmaster" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Topicsmaster<span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="topicsmaster" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">General Evaluator<span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="generalEvaluator" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Prepared speeches <span class="badge">+2</span></label>
+        <div class="col-sm-10">
+          <select id="preparedSpeeches" class="selectLimit3" multiple onchange="updateSelect(this, '#bestSpeaker')" >
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Table Topics <span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="tableTopics" class="selectMulti" multiple onchange="updateSelect(this, '#bestTableTopics')">
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Evaluator <span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="evaluator" class="selectLimit3" multiple onchange="updateSelect(this, '#bestEvaluator')">
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Best Speaker <span class="badge">+3</span></label>
+        <div class="col-sm-10">
+          <select id='bestSpeaker'>
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Best Table Topics <span class="badge">+2</span> </label>
+        <div class="col-sm-10">
+          <select id="bestTableTopics">
+            <!-- no person won, all disqualified -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Best Evaluator <span class="badge">+2</span></label>
+        <div class="col-sm-10">
+          <select id="bestEvaluator">
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Traveling Award <span class="badge">+2</span> </label>
+        <div class="col-sm-10">
+          <select id="travelingAward" class="select"> <!-- class="selectMulti" -->
+            <option value="NA"> NA </option>
+          </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="form-group row">
+        <label for="inputPassword" class="col-sm-2 col-form-label">Participants <span class="badge">+1</span> </label> 
+        <!-- <button class='btn-primary btn-sm' onclick=" addPeopleAbove(); return false;">Add people above</button> -->
+        <div class="col-sm-10">
+          <!-- <select id="participants" class="selectMulti" multiple>
+          </select> -->
+          <!-- Build your select: -->
+        <select id="participants" class="select" multiple="multiple">
+<!--             <option value="cheese">Cheese</option>
+            <option value="tomatoes">Tomatoes</option>
+            <option value="mozarella">Mozzarella</option>
+            <option value="mushrooms">Mushrooms</option>
+            <option value="pepperoni">Pepperoni</option>
+            <option value="onions">Onions</option> -->
+        </select>
+        </div>
+      </div>
+      <hr>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span> </label>
+        <div class="col-sm-10">
+          <select id="earlyTMSignUp" class="selectMulti" multiple>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span> </label>
+        <div class="col-sm-10">
+          <select id="memberSignUp" class="selectMulti" multiple>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <!-- best speaker select from one of three speakers -->
+        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
+        <div class="col-sm-10">
+          <select id="attendingSocial" class="selectMulti" multiple>
+          </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- <div class="row d-flex justify-content-center mt-100"> -->
+
+      <textarea id="myInput">Text will be generated here</textarea>
+
+      <br>
+      <!-- <input type="text" value="Hello World" id="myInput"> -->
+      <div class="my_tooltip">
+        <button onclick="updateText(); copy_text(); return false;" onmouseout="outFunc()" class="btn-primary btn">
+          <span class="my_tooltiptext" id="myTooltip">Generate and copy to clipboard</span>
+          Copy text
+        </button>
+        <!-- TODO: new memeber event -->
+      </div>
+
+       <!-- <button onclick="alert('not implemented yet. coming soon :)'); return false;"class="btn-primary btn">
+        <span class="" id="">Generate Meeting Recap</span>
+      </button> -->
+
+    </form>
   </div>
 
+  <div class="col-md-6" style="display:none">
+    <select id="names">
+      <!-- load from google sheets  -->
+     <!--  <option value="Abel"> Abel</option>
+      <option value="Abinav"> Abinav </option>
+      <option value="Aditya"> Aditya</option>
+      <option value="Akankshi"> Akankshi</option>
+      <option value="Aldanah"> Aldanah</option>
+      <option value="Amy"> Amy</option>
+      <option value="Arushi"> Arushi</option>
+      <option value="Austin"> Austin</option>
+      <option value="Brennan"> Brennan</option>
+      <option value="Chinedu"> Chinedu</option>
+      <option value="Christopher"> Christopher</option>
+      <option value="Eshani"> Eshani</option>
+      <option value="Jagannath"> Jagannath</option>
+      <option value="Jason"> Jason</option>
+      <option value="Jianing"> Jianing</option>
+      <option value="Jonathan"> Jonathan</option>
+      <option value="Jose"> Jose</option>
+      <option value="Kam"> Kam</option>
+      <option value="Karan"> Karan</option>
+      <option value="Maanasa"> Maanasa</option>
+      <option value="Manar"> Manar</option>
+      <option value="Manasa"> Manasa</option>
+      <option value="Minh"> Minh</option>
+      <option value="Nitin"> Nitin</option>
+      <option value="Omid"> Omid</option>
+      <option value="Randall"> Randall</option>
+      <option value="Reem"> Reem</option>
+      <option value="Riya"> Riya</option>
+      <option value="Saadallah"> Saadallah</option>
+      <option value="Sai"> Sai</option>
+      <option value="Sarah"> Sarah</option>
+      <option value="Sean"> Sean</option>
+      <option value="Shubham"> Shubham</option>
+      <option value="Spencer"> Spencer</option>
+      <option value="Wahab"> Wahab</option>
+      <option value="Zhen"> Zhenqiang</option>
+      <option value="Zed"> Zed</option>
+      <option value="Zoe"> Zoe</option> -->
+
+
+<!--       <option value="Abel"> Abel Abraham Philips </option>
+      <option value="Aditya"> Aditya Ojha </option>
+      <option value="Akankshi"> Akankshi Manish Mody, IP1 </option>
+      <option value="Aldanah"> Aldanah A Alqahtani </option>
+      <option value="Amy"> Amy Nguyen </option>
+      <option value="Arushi"> Arushi Guddanti, DL1 </option>
+      <option value="Austin"> Austin Kyler Morgan </option>
+      <option value="Brennan"> Brennan Dubuc, CC </option>
+      <option value="Chinedu"> Chinedu Enwere </option>
+      <option value="Christopher"> Christopher C. Hsu </option>
+      <option value="Eshani"> Eshani S Kaul </option>
+      <option value="Jagannath"> Jagannath Swaminathan, ACB </option>
+      <option value="Jason"> Jason Gene Cox </option>
+      <option value="Jianing"> Jianing Lei </option>
+      <option value="Jonathan"> Jonathan Garcia </option>
+      <option value="Jose"> Jose Chavez </option>
+      <option value="Kam"> Kam Knight </option>
+      <option value="Karan"> Karan Palsani, PI1 </option>
+      <option value="Maanasa"> Maanasa Cherukuvada </option>
+      <option value="Manar"> Manar Hasan, ACB </option>
+      <option value="Manasa"> Manasa Kotamraju </option>
+      <option value="Minh"> Minh L. Pham, MS2 </option>
+      <option value="Nitin"> Nitin Jain </option>
+      <option value="Omid"> Omid Meh </option>
+      <option value="Randall"> Randall Peyton </option>
+      <option value="Reem"> Reem Alomar </option>
+      <option value="Saadallah"> Saadallah Kassir, CL </option>
+      <option value="Sai"> Sai Krishna Vogirala, IP1 </option>
+      <option value="Sarah"> Sarah Seraj, PI1 </option>
+      <option value="Sean"> Sean Trapp </option>
+      <option value="Shubham"> Shubham Singh </option>
+      <option value="Spencer"> Spencer Dee Gregory </option>
+      <option value="Wahab"> Wahab Choudhry </option>
+      <option value="Zhen"> Zhenqiang Ying </option>
+      <option value="Zed"> Zed Yuan </option> -->
+    </select>
+  </div>
+
+  </div>
+
+  
   <div class="box">
     <!-- view only -->
     <!-- <iframe onload="this.width=0.55*screen.width;" frameborder="0" scrolling="no" height="100%vh" align="left" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml?widget=true&amp;headers=false"></iframe> -->
-    <iframe onload="this.width=0.55*screen.width;" frameborder="0" scrolling="no" height="100%vh" align="left" src="https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/edit"></iframe>
+    <iframe onload="this.width=0.6*screen.width;" frameborder="0" scrolling="no" height="100%" align="left" src="https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/edit"></iframe>
   </div>
+
+    <script type="text/javascript"  src="js/googleSheets.js" ></script>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+    <script type="text/javascript"  src="js/toasties.js" ></script>
 </body>
+
+</html>
