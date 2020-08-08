@@ -1,8 +1,8 @@
 // Client ID and API key from the Developer Console
 // new project: utstm
 var CLIENT_ID = '1093544076583-03qlvcjmfb9agmfi2088baaqa92suppj.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyALhvpv_etcfYyqg03Wplz0rTMF3EIBQPs';
-// var API_KEY = '';
+// var API_KEY = 'AIzaSyALhvpv_etcfYyqg03Wplz0rTMF3EIBQPs';
+var API_KEY = '';
 
 // must allow reading 
 // Error: Request had insufficient authentication scopes.
