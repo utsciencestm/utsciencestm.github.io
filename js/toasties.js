@@ -85,10 +85,16 @@ function init() { // call it after names are loaded
   // after adding options
   $('#participants').multiselect();
   // $('#selectDropdowns #participants').multiselect({ buttonWidth:'100px',listWidth:'300px',maxHeight:'70vh' });
+
+  // load column
+  var column = getUrlVars()["column"];
+  loadData(column);
 }
 
 $(document).ready(function() {
-  // init();
+  // if (isSignedIn) {
+  //   listNames();
+  //  }
 });
 
 // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard2
@@ -116,6 +122,8 @@ function outFunc() {
  */
 var names = [];
 function listNames() {
+  if (names.length != 0) {return;}
+
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4',
     // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
@@ -133,7 +141,7 @@ function listNames() {
         names.push(firstName);
         $('<option>').val(firstName).text(firstName).appendTo('#names');
       }
-       init();
+      init();
     } else {
       appendPre('No data found.');
     }
@@ -179,9 +187,9 @@ function loadData(col) {
     // $('#earlyTMSignUp').val(range.values[11][0]);
     // $('#memberSignUp').val(range.values[12][0]);
     // $('#attendingSocial').val(range.values[13][0]);
-    if (range.values[11]) {choices.earlyTMSignUp.setValue(range.values[11][0].split(','));}
-    if (range.values[12]) {choices.memberSignUp.setValue(range.values[12][0].split(','));}
-    if (range.values[13]) {choices.attendingSocial.setValue(range.values[13][0].split(','));}
+    if (range.values[11][0]) {choices.earlyTMSignUp.setValue(range.values[11][0].split(','));}
+    if (range.values[12][0]) {choices.memberSignUp.setValue(range.values[12][0].split(','));}
+    if (range.values[13][0]) {choices.attendingSocial.setValue(range.values[13][0].split(','));}
     } else {
       appendPre('No data found.');
     }

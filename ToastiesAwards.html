@@ -78,29 +78,76 @@ Received Traveling Award +2
  <!-- <div class="container">  -->
   <!-- width:38vw -->
     <!-- Content here -->
+    <!-- class="alert alert-warning alert-dismissible fade show" role="alert" -->
 
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.) 
-         <!--Add buttons to initiate auth sequence and sign out-->
-         <!-- href="/googleSheets.html" target="_blank"  -->
-        <a class="btn btn-sm btn-light" id="authorize_button" style="display: none;">Authorize</a>
-        <a class="btn btn-sm btn-light" id="signout_button" style="display: none;">Sign Out</a>
-        <pre id="content" style="white-space: pre-wrap;"></pre>
 
-        <strong>Step 1. </strong> Fill in the form one by one. <br/>
-        <strong>Step 2. </strong> Click "Done" to copy the generated text. <br/>
-        <strong>Step 3. </strong> Paste to the Google Sheet.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+
+	   <button class="btn btn-primary" data-toggle="collapse" href="#instructions" role="button" aria-expanded="false" aria-controls="instructions">
+	    Instructions
+	  </button>
+	   <button class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+	    edit earlier meeting
+	  </button>
+
+	   <button class="btn btn-primary" data-toggle="collapse" href="#addNewMember" role="button" aria-expanded="false" aria-controls="addNewMember">
+	    add new member
+	  </button>
+
+
+	  <button class="btn btn-primary" onclick="location.href = window.location.origin + '/ToastiesAwards.html' ">
+	    clear all
+	  </button>
+	  
+<!-- 	  Morbi leo risus</li>
+	  Porta ac consectetur ac</li>
+	  Vestibulum at eros</li> -->
+
+	<div class="collapse multi-collapse" id="instructions" >
+		<div class="card card-body">
+			<div>
+	        <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.) 
+	         <!--Add buttons to initiate auth sequence and sign out-->
+	         <!-- href="/googleSheets.html" target="_blank"  -->
+	        <a class="btn btn-sm btn-light" id="authorize_button" style="display: none;">Authorize</a>
+	        <a class="btn btn-sm btn-light" id="signout_button" style="display: none;">Sign Out</a>
+	        <pre id="content" style="white-space: pre-wrap;"></pre>
+
+	        <strong>Step 1. </strong> Fill in the form one by one. <br/>
+	        <strong>Step 2. </strong> Click "Done" to copy the generated text. <br/>
+	        <strong>Step 3. </strong> Paste to the <a href="https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/">Google Sheet</a>.
+	      </div>
+	      </div>
       </div>
 
 
-     Load data from column: <input type="text" id="meetingCol" name="meetingCol">
-        <button onclick="loadData($('#meetingCol').val()); return false;" class="btn-primary btn">
-         Load
+	<div class="collapse multi-collapse" id="collapseExample">
+	  <div class="card card-body">
+	    Enter the letter corresponding the first column of that meeting (read it from the google sheets, e.g. C for meeting #29, E for meeting #30)
+        and click LOAD
+        <div>
+        	 <input type="text" id="meetingCol" name="meetingCol">
+        <button onclick="location.href = window.location.origin + '/ToastiesAwards.html?column='+$('#meetingCol').val().trim(); return false;" class="btn-primary btn">
+         LOAD
         </button>
-        <br><br>
+        </div>
+       
+	  </div>
+	</div>
+
+	<div class="collapse multi-collapse" id="addNewMember">
+	  <div class="card card-body">
+	    In the goolge sheet, insert a new row and input her/his full name,
+        and then refresh the page to load it.
+        <div>
+        <button onclick="location.reload();return false;" class="btn-primary btn">
+         refresh the page
+        </button>
+        </div>
+       
+	  </div>
+	</div>
+
+
 
     <form onchange="addPeopleAbove()">
       
