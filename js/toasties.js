@@ -1,4 +1,6 @@
-
+$(function () {
+  $('.fa').popover({trigger: "hover"});
+})
 function addParticipant(element) {  // , index, array
   $('select#participants option[value='+element+']').attr('selected','selected');
 }
@@ -83,7 +85,7 @@ function init() { // call it after names are loaded
   choices.attendingSocial = new Choices('#attendingSocial', {removeItemButton: true, searchResultLimit: 8});
 
   // after adding options
-  $('#participants').multiselect();
+  $('#participants').multiselect({'maxHeight': "300"});
   // $('#selectDropdowns #participants').multiselect({ buttonWidth:'100px',listWidth:'300px',maxHeight:'70vh' });
 
   // load column

@@ -63,6 +63,7 @@ Received Traveling Award +2
   
   <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
   <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css"/>
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -203,7 +204,11 @@ Received Traveling Award +2
 
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Evaluator <span class="badge">+1</span></label>
+        <label for="inputPassword" class="col-sm-2 col-form-label">Evaluator 
+          <span class="badge">+1</span>
+          <span><i data-content="Please include the TableTopic evalutor as well!" class="fa fa-exclamation-circle"></i></span>
+        </label>
+        
         <div class="col-sm-10">
           <select id="evaluator" class="selectLimit3" multiple onchange="updateSelect(this, '#bestEvaluator')">
           </select>
@@ -277,7 +282,9 @@ Received Traveling Award +2
         <div class="col-sm-10">
 
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span> </label>
+        <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span> 
+        <span><i data-content="Sign-up when Adi pull out the sheet for supporting roles of the next meeting" class="fa fa-question-circle"></i></span>
+        </label>
         <div class="col-sm-10">
           <select id="earlyTMSignUp" class="selectMulti" multiple>
           </select>
@@ -287,7 +294,9 @@ Received Traveling Award +2
         <div class="col-sm-10">
 
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span> </label>
+        <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span> 
+          <span><i data-content="who brings a new club member" class="fa fa-question-circle"></i></span>
+        </label>
         <div class="col-sm-10">
           <select id="memberSignUp" class="selectMulti" multiple>
           </select>
@@ -296,7 +305,10 @@ Received Traveling Award +2
 
         <div class="col-sm-10">
 	        <!-- best speaker select from one of three speakers -->
-	        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social <span class="badge">+1</span></label>
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social 
+            <span class="badge">+1</span>
+            <span><i data-content="We have a social event after each meeting" class="fa fa-question-circle"></i></span>
+          </label>
 	        <div class="col-sm-10">
 	          <select id="attendingSocial" class="selectMulti" multiple>
 	          </select>
