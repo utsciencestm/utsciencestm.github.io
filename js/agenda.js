@@ -11,15 +11,42 @@ $(document).ready(function() {
   loadData();
 });
 
+var meeting_col = 1;
 
 function whois(role) {
   role = role.trim();
-  for (let i = 0; i < entry.length; i++) {
+  // problemetic if there are empty cells
+  // for (let i = 0; i < entry.length; i++) {
+  //   if(entry[i].content.$t.includes(role)) {
+  //   return  entry[i+offset].content.$t;
+  //   }
+  // }
+  var i;
+  for (i = 0; i < entry.length; i++) {
     if(entry[i].content.$t.includes(role)) {
-    return  entry[i+offset].content.$t;
+      break;
+    }
+  }
+  if (i == entry.length) {return 'ERROR'}
+  let row = entry[i].gs$cell.row;
+  for (let j = 1; entry[i+j].gs$cell.row == row; j++) {
+    if(entry[i+j].gs$cell.col == meeting_col) {
+        return  entry[i+j].content.$t;
+    }
+  }
+  return 'TBA';
+}
+
+function getData(row, col) {
+  row = '' + row // to string
+  col = '' + col
+  for (let i = 0; i < entry.length; i++) {
+    if(entry[i].gs$cell.row == row && entry[i].gs$cell.col == col) {
+      return  entry[i].content.$t;
     }
   }
 }
+
 
 // https://html-online.com/articles/get-url-parameters-javascript/
 function getUrlVars() {
@@ -51,6 +78,7 @@ function loadData() {
             let date = new Date(entry[i+j].content.$t.trim())
             if(today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
                 offset = j;
+                meeting_col = entry[i+j].gs$cell.col;
                 break;
             }
           }
@@ -63,6 +91,7 @@ function loadData() {
           for (let j = 1; j < 10; j++) {
             if(entry[i+j].content.$t.trim() == number) {
                 offset = j;
+                meeting_col = entry[i+j].gs$cell.col;
                 break;
             }
           }
