@@ -112,6 +112,7 @@ function loadData() {
     $('#whoIsSpeaker2').html(whois('Speaker # 2'));
     $('#whoIsSpeaker3').html(whois('Speaker # 3'));
     $('#whoIsGeneralEvaluator').html(whois('General Evaluator'));
+    $('#whoIsTableTopicsEvaluator').html(whois('TableTopics Evaluator'));
     $('#whoIsEvaluator1').html(whois('Evaluator # 1'));
     $('#whoIsEvaluator2').html(whois('Evaluator # 2'));
     $('#whoIsEvaluator3').html(whois('Evaluator # 3'));
@@ -121,6 +122,7 @@ function loadData() {
     $('#whatSpeech1').html(whois('#1 Manual,'));
     $('#whatSpeech2').html(whois('#2 Manual,'));
     $('#whatSpeech3').html(whois('#3 Manual,'));
+    $('#announcement').html(whois('annoucement'));
   });
 
   // <I>
