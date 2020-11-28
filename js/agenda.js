@@ -79,8 +79,17 @@ function loadData() {
             if(today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
                 offset = j;
                 meeting_col = entry[i+j].gs$cell.col;
+                console.log('offset: ' + offset + ', meeting_col:' + meeting_col)
+                break;
+            } 
+            // next month 
+            else if(today.getMonth() < date.getMonth() ) {
+                offset = j;
+                meeting_col = entry[i+j].gs$cell.col;
+                console.log('offset: ' + offset + ', meeting_col:' + meeting_col)
                 break;
             }
+
           }
         }
       }
@@ -100,6 +109,8 @@ function loadData() {
     }
 
     // problem: if is empty, will go to next
+    // highlight roles that have not been assigned 
+    // add presiding officer
 
     $('#whatIsDate').html(whois('Date'));
     $('#meetingNo').html(whois('Meeting #'));
@@ -108,6 +119,7 @@ function loadData() {
     $('#whoIsAhCounter').html(whois('Ah Counter'));
     $('#whoIsGrammarian').html(whois('Grammarian')); // not Grammerian's word of the day, match the first one
     $('#whoIsTimeKeeper').html(whois('Time Keeper'));
+    $('#whoIsVoteCounter').html(whois('Vote Counter'));
     $('#whoIsSpeaker1').html(whois('Speaker # 1'));
     $('#whoIsSpeaker2').html(whois('Speaker # 2'));
     $('#whoIsSpeaker3').html(whois('Speaker # 3'));
