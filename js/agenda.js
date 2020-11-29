@@ -107,7 +107,7 @@ function fillInForm() {
   "#whatSpeech1": "#1 Manual,",
   "#whatSpeech2": "#2 Manual,",
   "#whatSpeech3": "#3 Manual,",
-  "#announcement": "annoucement",
+  // "#announcement": "annoucement",
   }
   var roles = {
   "#whoIsToastmaster": "Toastmaster",
@@ -125,6 +125,8 @@ function fillInForm() {
   "#whoIsEvaluator3": "Evaluator # 3",
   "#whoIsTopicsMaster": "Topics Master",
   };
+
+
 
   for(var element in info) {
     fillInInfo(info[element], element);
@@ -145,6 +147,43 @@ function fillInForm() {
     var role = roles[element];
     fillInSuggestion(element);
   }
+
+  if ($('#whoIsEvaluator1').text() == '-') {
+    $('#eval1').html('-')
+  }
+  if ($('#whoIsEvaluator2').text() == '-') {
+    $('#eval2').html('-')
+  }
+  if ($('#whoIsEvaluator3').text() == '-') {
+    $('#eval3').html('-')
+  }
+}
+
+// move the tab to the second 
+function nextMeeting() { // error if in another tab 
+  // var meeting_no = Number($('#meetingNo').text()) - 1;
+  var i = getCellIndex('Meeting #');
+  if (i == entry.length) {return 'ERROR'}
+  if(entry[i+1].gs$cell.row == entry[i].gs$cell.row ) {
+    let meeting_no = Number(entry[i+1].content.$t)
+    location.href = window.location.origin + '/agenda.html?number='+meeting_no; 
+    console.log(location.href)
+  } else {
+    alert('Not found! Create a new tab and put it as the second tab in the sign up sheet.')
+  }
+  return false
+}
+function prevMeeting() {
+  var i = getCellIndex('Meeting #');
+  if (i == entry.length) {return 'ERROR'}
+  if(entry[i-1].gs$cell.col > 1) {
+    let meeting_no = Number(entry[i-1].content.$t);
+    location.href = window.location.origin + '/agenda.html?number='+meeting_no; 
+    console.log(location.href)
+  } else {
+    alert('The last meeting has been archived.');
+  }
+  return false
 }
 
 function getMeetingCol(entry) {
@@ -221,7 +260,7 @@ function getUnavailableMembers(data, entry) {
   return members;
 }
 
-function whois(role) {
+function getCellIndex(role) {
   role = role.trim();
   // problemetic if there are empty cells
   // for (let i = 0; i < entry.length; i++) {
@@ -239,12 +278,16 @@ function whois(role) {
   let row = entry[i].gs$cell.row;
   for (let j = 1; entry[i+j].gs$cell.row == row; j++) {
     if(entry[i+j].gs$cell.col == meeting_col) {
-      let val = entry[i+j].content.$t;
-        return  val;
+      return i+j;
     }
   }
-  // give suggestions instead of returning TBA
-  return 'TBA';
+  return -1
+}
+
+function whois(role) {
+  var idx = getCellIndex(role);
+  if (idx == -1) {return 'TBA'; }
+  else {return entry[idx].content.$t;}
 }
 
 function getData(row, col) {
