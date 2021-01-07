@@ -18,7 +18,7 @@ $(document).ready(function() {
   //  }
   // loadData();
 
-  // wait for all sheets are loaded 
+  // wait for all sheets are loaded
   var members_loaded = new Promise(function(resolve) {
       document.addEventListener("memberListLoaded",resolve,false);
   })
@@ -43,7 +43,7 @@ $(document).ready(function() {
     console.log(json);
     members = listMembers(json, json.feed.entry)
     active_members = Object.keys(members).filter(key => members[key] >= 10);
-    
+
     n_members = Object.keys(members).length
     n_active_members = Object.keys(active_members).length
     console.log(n_members + ' members: ' + members);
@@ -57,7 +57,7 @@ $(document).ready(function() {
       // after getting meeting col
 
     // get a fixed list of people and shuffle it
-    
+
     seed = Number(whois('Meeting #'));
     console.log('seed:', seed);
     shuffle(active_members, seed);
@@ -65,11 +65,11 @@ $(document).ready(function() {
     console.log('Unavailable: ' + unavailable_members);
 
 
-    // get assigned people 
+    // get assigned people
     fillInForm();
 
     // problem: if is empty, will go to next
-    // highlight roles that have not been assigned 
+    // highlight roles that have not been assigned
     // add presiding officer
 
   });
@@ -137,9 +137,9 @@ function fillInForm() {
   }
 
   console.log('Assigned: ' + assigned_members);
-  // add those who already assigned 
+  // add those who already assigned
 
-  available_active_members = $.grep(active_members, function(el){return $.inArray(el, unavailable_members) == -1 &&  ($.inArray(el, assigned_members) == -1) }); 
+  available_active_members = $.grep(active_members, function(el){return $.inArray(el, unavailable_members) == -1 &&  ($.inArray(el, assigned_members) == -1) });
   console.log('To be assigned: ' + available_active_members);
 
 
@@ -159,14 +159,14 @@ function fillInForm() {
   }
 }
 
-// move the tab to the second 
-function nextMeeting() { // error if in another tab 
+// move the tab to the second
+function nextMeeting() { // error if in another tab
   // var meeting_no = Number($('#meetingNo').text()) - 1;
   var i = getCellIndex('Meeting #');
   if (i == entry.length) {return 'ERROR'}
   if(entry[i+1].gs$cell.row == entry[i].gs$cell.row ) {
     let meeting_no = Number(entry[i+1].content.$t)
-    location.href = window.location.origin + '/agenda.html?number='+meeting_no; 
+    location.href = window.location.origin + '/agenda.html?number='+meeting_no;
     console.log(location.href)
   } else {
     alert('Not found! Create a new tab and put it as the second tab in the sign up sheet.')
@@ -178,55 +178,60 @@ function prevMeeting() {
   if (i == entry.length) {return 'ERROR'}
   if(entry[i-1].gs$cell.col > 1) {
     let meeting_no = Number(entry[i-1].content.$t);
-    location.href = window.location.origin + '/agenda.html?number='+meeting_no; 
+    location.href = window.location.origin + '/agenda.html?number='+meeting_no;
     console.log(location.href)
   } else {
     alert('The last meeting has been archived.');
   }
   return false
 }
-
+var j = 1;
+var i = 0;
 function getMeetingCol(entry) {
       // console.log(whois('Date'));
     // var meetingNo = '' +
+    // let j = 1;
+    // let i = 0;
     if (getUrlVars()["number"] == undefined) {
       var today = new Date();
       // show the coming meeting (or current meeting)
-      for (let i = 0; i < entry.length; i++) {
+
+      for (;i < entry.length; i++) {
         if(entry[i].content.$t.trim() == 'Date') {
-          for (let j = 1; j < 10; j++) {
+          for (;j < 10; j++) {
             let date = new Date(entry[i+j].content.$t.trim())
-            if(today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
-                offset = j;
-                meeting_col = entry[i+j].gs$cell.col;
-                console.log('offset: ' + offset + ', meeting_col:' + meeting_col)
+            if( today.getFullYear() === date.getFullYear() ) {
+              if (today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
                 break;
-            } 
-            // next month 
-            else if(today.getMonth() < date.getMonth() ) {
-                offset = j;
-                meeting_col = entry[i+j].gs$cell.col;
-                console.log('offset: ' + offset + ', meeting_col:' + meeting_col)
+              } // next month
+              else if (today.getMonth() < date.getMonth() ) {
+                  break;
+              }
+            }  // next year
+            else if( today.getFullYear() < date.getFullYear()) {
                 break;
             }
-
           }
+          break;
         }
       }
+
     } else {
       number = getUrlVars()["number"].trim()
-      for (let i = 0; i < entry.length; i++) {
+      for (i = 0; i < entry.length; i++) {
         if(entry[i].content.$t.includes('Meeting #')) {
-          for (let j = 1; j < 10; j++) {
+          for (j = 1; j < 10; j++) {
             if(entry[i+j].content.$t.trim() == number) {
-                offset = j;
-                meeting_col = entry[i+j].gs$cell.col;
                 break;
             }
           }
+          break;
         }
       }
     }
+    offset = j;
+    meeting_col = entry[i+j].gs$cell.col;
+    console.log('offset: ' + offset + ', meeting_col:' + meeting_col)
     return meeting_col;
 }
 
@@ -245,7 +250,7 @@ function getUnavailableMembers(data, entry) {
 
   if (i == entry.length) {return 'ERROR'}
   let row = entry[i].gs$cell.row;
-  
+
   // TODO: compute how many columns might be more efficient
   let members = [];
   for (let j = 1; entry[i+j]; j++) {
@@ -318,7 +323,7 @@ const getFirstWord = string => {
 };
 
 // list members
-// find the cell and then get all following rows with col=0 and col1 
+// find the cell and then get all following rows with col=0 and col1
 
 function listMembers(data, entry) {
   text = 'Total Points'
@@ -332,7 +337,7 @@ function listMembers(data, entry) {
 
   if (i == entry.length) {return 'ERROR'}
   let row = entry[i].gs$cell.row;
-  
+
   // TODO: compute how many columns might be more efficient
   var members = {};
   for (let j = 1; entry[i+j]; j++) {
@@ -347,17 +352,17 @@ function listMembers(data, entry) {
         // console.log(name + ':' + points);
     }
   }
-  
+
   return members;
 }
 
   // compute offset if meeting id is none
   // 36
-  // simply use the google sheet id in address bar 
+  // simply use the google sheet id in address bar
 
   // var url="https://docs.google.com/spreadsheet/pub?key=p_aHW5nOrj0VO2ZHTRRtqTQ&single=true&gid=0&range=A1&output=csv";
   // var url="https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
-  
+
 
 
 
@@ -367,11 +372,11 @@ function listMembers(data, entry) {
 
 
 
-    
 
 
 
-    
+
+
 
 
     // automatically assign people roles
@@ -382,7 +387,7 @@ function listMembers(data, entry) {
     // Adi puts in the name of the suggestion if they agree with that.
     // if not, select other roles (ask to switch with other people)
 
-    // todo: add a next meeting link 
+    // todo: add a next meeting link
 
   // <I>
   // </I></FONT></FONT><FONT FACE="Arial, serif"><FONT SIZE=1 STYLE="font-size: 8pt">disillusioned
