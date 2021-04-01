@@ -103,26 +103,26 @@ function fillInForm() {
   "#whoIsPresidingOfficer": "Presiding Officer",
   "#whichRoom": "Room",
   "#whatTheme": "Theme",
-  "#whatWordOfTheDay": "Word of the Day",
-  "#whatSpeech1": "#1 Manual,",
-  "#whatSpeech2": "#2 Manual,",
-  "#whatSpeech3": "#3 Manual,",
+  "#whatWordOfTheDay": "Grammarian's Word of the Day",
+  "#whatSpeech1": "#1 Manual, Project, Speech Title and Duration",
+  "#whatSpeech2": "#2 Manual, Project, Speech Title and Duration",
+  "#whatSpeech3": "#3 Manual, Project, Speech Title and Duration",
   // "#announcement": "annoucement",
   }
   var roles = {
+  "#whoIsAhCounter": "Ah Counter.     (2 mins) ",
   "#whoIsToastmaster": "Toastmaster",
-  "#whoIsAhCounter": "Ah Counter",
-  "#whoIsGrammarian": "Grammarian",
+  "#whoIsGrammarian": "Grammarian     (2 mins)",
   "#whoIsTimeKeeper": "Time Keeper",
   "#whoIsVoteCounter": "Vote Counter",
   "#whoIsSpeaker1": "Speaker # 1",
   "#whoIsSpeaker2": "Speaker # 2",
   "#whoIsSpeaker3": "Speaker # 3",
   "#whoIsGeneralEvaluator": "General Evaluator",
-  "#whoIsTableTopicsEvaluator": "TableTopics Evaluator",
-  "#whoIsEvaluator1": "Evaluator # 1",
-  "#whoIsEvaluator2": "Evaluator # 2",
-  "#whoIsEvaluator3": "Evaluator # 3",
+  "#whoIsTableTopicsEvaluator": "TableTopics Evaluator (2-3 mins)",
+  "#whoIsEvaluator1": "Evaluator # 1 (2-3 mins)",
+  "#whoIsEvaluator2": "Evaluator # 2 (2-3 mins)",
+  "#whoIsEvaluator3": "Evaluator # 3 (2-3 mins)",
   "#whoIsTopicsMaster": "Topics Master",
   };
 
@@ -142,21 +142,31 @@ function fillInForm() {
   available_active_members = $.grep(active_members, function(el){return $.inArray(el, unavailable_members) == -1 &&  ($.inArray(el, assigned_members) == -1) });
   console.log('To be assigned: ' + available_active_members);
 
+  // disable speech role suggestion, don't show it if there are no speaker
+  if ($('#whoIsSpeaker1').text() == 'TBA') {
+    $('#whoIsSpeaker1').html('&nbsp;')
+    $('#whatSpeech1').html('&nbsp;')
+    $('#whoIsEvaluator1').html('&nbsp;')
+    $('#eval1').html('&nbsp;')
+  }
+  if ($('#whoIsSpeaker2').text() == 'TBA') {
+    $('#whoIsSpeaker2').html('&nbsp;')
+    $('#whatSpeech2').html('&nbsp;')
+    $('#whoIsEvaluator2').html('&nbsp;')
+    $('#eval2').html('&nbsp;')
+  }
+  if ($('#whoIsSpeaker3').text() == 'TBA') {
+    $('#whoIsSpeaker3').html('&nbsp;')
+    $('#whatSpeech3').html('&nbsp;')
+    $('#whoIsEvaluator3').html('&nbsp;')
+    $('#eval3').html('&nbsp;')
+  }
 
   for(var element in roles) {
     var role = roles[element];
     fillInSuggestion(element);
   }
 
-  if ($('#whoIsEvaluator1').text() == '-') {
-    $('#eval1').html('-')
-  }
-  if ($('#whoIsEvaluator2').text() == '-') {
-    $('#eval2').html('-')
-  }
-  if ($('#whoIsEvaluator3').text() == '-') {
-    $('#eval3').html('-')
-  }
 }
 
 // move the tab to the second
@@ -265,7 +275,7 @@ function getUnavailableMembers(data, entry) {
   return members;
 }
 
-function getCellIndex(role) {
+function getCellIndex(role, strict=true) {
   role = role.trim();
   // problemetic if there are empty cells
   // for (let i = 0; i < entry.length; i++) {
@@ -275,9 +285,13 @@ function getCellIndex(role) {
   // }
   var i;
   for (i = 0; i < entry.length; i++) {
-    if(entry[i].content.$t.includes(role)) {
+    if(strict && entry[i].content.$t.trim() == role) {
       break;
     }
+    if( !strict && entry[i].content.$t.includes(role)) {
+      break;
+    }
+    // console.log(entry[i].content.$t.trim())
   }
   if (i == entry.length) {return 'ERROR'}
   let row = entry[i].gs$cell.row;
@@ -289,8 +303,8 @@ function getCellIndex(role) {
   return -1
 }
 
-function whois(role) {
-  var idx = getCellIndex(role);
+function whois(role, strict=true) {
+  var idx = getCellIndex(role, strict);
   if (idx == -1) {return 'TBA'; }
   else {return entry[idx].content.$t;}
 }
