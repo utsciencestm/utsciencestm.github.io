@@ -340,6 +340,7 @@ const getFirstWord = string => {
 // find the cell and then get all following rows with col=0 and col1
 
 function listMembers(data, entry) {
+  console.log('locating cell with the content being Total Points')
   text = 'Total Points'
   var i;
   for (i = 0; i < entry.length; i++) {
@@ -356,14 +357,14 @@ function listMembers(data, entry) {
   var members = {};
   for (let j = 1; entry[i+j]; j++) {
     if(entry[i+j].gs$cell.col == 1) {
-      name = entry[i+j].content.$t;
-      points = entry[i+j+1].content.$t;
+      name = entry[i+j+1].content.$t; // column 'abbr'
+      points = entry[i+j+2].content.$t; // column 'scores'
       if(name == ''){
         break;
       }
-        members[getFirstWord(name)] = Number(points);
-        j ++;
-        // console.log(name + ':' + points);
+      console.log(name + ':' + points);
+      members[getFirstWord(name)] = Number(points);
+      j ++;
     }
   }
 
