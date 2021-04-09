@@ -7,12 +7,126 @@
   <link href="https://fonts.googleapis.com/css?family=Arvo&display=swap" rel="stylesheet">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
   <style>
+    .box {
+      display: inline-block;
+      height: 100vh;
+    }
+
+    .mt-100 {
+      margin-top: 100px
+    }
+
+    body {
+      /* background: #D3D3D3; */
+      /* background: -webkit-linear-gradient(to right, #F8F8F8, #D3D3D3); */
+      /* background: linear-gradient(to right, #F8F8F8, #D3D3D3); */
+      /* color: #000000; */
+      min-height: 100vh
+    }
+
+    /* #names {
+    width: 50%;
+    margin: auto;
+  } */
+
+    label {
+      min-width: 200px !important;
+      display: inline-block !important
+    }
   </style>
 </head>
 
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/load_meeting_info.js"></script>
+<script type="text/javascript">
+  var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
+  var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
+  var res;
+  $(document).ready(function() {
+    // wait for all sheets are loaded
+    // first prepare listener
+    console.log("document is ready")
+    var members_loaded = new Promise(function(resolve) {
+      document.addEventListener("memberListLoaded", resolve, false);
+    })
+    var roles_loaded = new Promise(function(resolve) {
+      document.addEventListener("signUpSheetLoaded", resolve, false);
+    })
+    signupSheet = new SignupSheet();
+    toastiesSheet = new ToastiesSheet();
+    jQuery.getJSON(URL_SIGNUPSHEET, function(json) {
+      signupSheet.loadJson(json)
+    });
+    jQuery.getJSON(URL_TOASTIESSHEET, function(json) {
+      toastiesSheet.loadJson(json)
+    });
+
+    Promise.all([members_loaded, roles_loaded]).then(function() {
+      // after getting meeting col
+
+      // get a fixed list of people and shuffle it
+      // seed = Number(signupSheet.whois('Meeting #'));
+      // console.log('seed:', seed);
+      // shuffle(active_members, seed);
+      let unavailable_members = signupSheet.unavailableMembers;
+      res = signupSheet.computeMeetingScores(toastiesSheet.members);
+      console.log(res);
+      // get assigned people
+      // signupSheet.fillInForm();
+      // problem: if is empty, will go to next
+      // highlight roles that have not been assigned
+      // add presiding officer
+      updateText();
+    });
+  });
+  // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_copy_clipboard2
+  function copy_text() {
+    var copyText = document.getElementById("myInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+
+    var my_tooltip = document.getElementById("myTooltip");
+    // my_tooltip.innerHTML = "Copied: " + copyText.value;
+    my_tooltip.innerHTML = "COPIED"
+  }
+
+  function updateText() {
+    $('#myInput').val(res);
+  }
+
+  function outFunc() {
+    // var my_tooltip = document.getElementById("myTooltip");
+    // my_tooltip.innerHTML = "Generate and copy to clipboard";
+    // my_tooltip.innerHTML = "DONE";
+  }
+</script>
+
 <body>
-  <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript"  src="js/get_member_points.js" ></script>
-  <script type="text/javascript"  src="js/scores.js" ></script>
+  <div>
+    <ol type="1">
+      <li>Fill in <a href="https://docs.google.com/spreadsheets/d/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/" target="_blank">the sign-up sheet</a>:
+        Please use SHORT NAMES provided in this page (e.g. use Adi instead of Aditya);
+        <br> Use commas to separate names;
+        <br> For "participants", don't include those who has a role.
+      </li>
+      <li>Refresh this page to load the updated information</li>
+      <li>Click "copy" and paste to the corresponding column</li>
+    </ol>
+    <hr>
+    <div class="my_tooltip d-flex justify-content-center">
+      <textarea id="myInput" style="display: block">Text will be generated here</textarea>
+      <button onclick="updateText(); copy_text(); return false;" onmouseout="outFunc()" class="btn-primary btn">
+        <span class="my_tooltiptext" id="myTooltip">COPY</span>
+      </button>
+      <!-- TODO: new memeber event -->
+    </div>
+  </div>
+  <!-- view only -->
+  <!-- <iframe onload="this.width=0.55*screen.width;" frameborder="0" scrolling="no" height="100%vh" align="left" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml?widget=true&amp;headers=false"></iframe> -->
+  <iframe onload="this.width=screen.width;this.height=0.6*screen.height;" frameborder="0" scrolling="no" align="left"
+  src="https://docs.google.com/spreadsheets/d/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/edit#gid=962846178">
+</iframe>
 </body>
+
 </html>

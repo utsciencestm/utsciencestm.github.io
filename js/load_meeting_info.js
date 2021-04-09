@@ -7,8 +7,8 @@ function getUrlVars() {
     return vars;
 }
 const getFirstWord = string => {
-    const words = string.split(' ');
-    return words[0];
+    const words = string.trim().split(' ');
+    return words[0].toUpperCase();
 };
 var INFO = {
 "#whatIsDate": "Date",
@@ -38,6 +38,27 @@ var ROLES = {
 "#whoIsEvaluator3": "Evaluator # 3 (2-3 mins)",
 "#whoIsTopicsMaster": "Topics Master",
 };
+var SCORES = {
+"Participants": 1, // don't include those who has roles
+"Social Participants": 1,
+"Early TM sign-up": 1,
+"Speaker # 1": 2+1,
+"Speaker # 2": 2+1,
+"Speaker # 3": 2+1,
+"Evaluator # 1 (2-3 mins)": 1+1,
+"Evaluator # 2 (2-3 mins)": 1+1,
+"Evaluator # 3 (2-3 mins)": 1+1,
+"TableTopics Evaluator (2-3 mins)": 2+1,
+"General Evaluator": 1+1,
+"Topics Master": 1+1,
+"Toastmaster": 1+1,
+"Best Speaker": 3,
+"Best Table Topics": 2,
+"Best Evaluator": 2,
+"Traveling Award": 2,
+"Member Sign-up": 4,
+};
+// removed table topic speakers. no need to track
 
 class ToastiesSheet {
   constructor() {
@@ -50,11 +71,11 @@ class ToastiesSheet {
     this.data = json;
     console.log(this.data);
     console.log('---' + this.constructor.name);
-    let members = this.listMembers();
-    let active_members = Object.keys(members).filter(key => members[key] >= 10);
-    let n_members = Object.keys(members).length
+    this.members = this.listMembers();
+    let active_members = Object.keys(this.members).filter(key => this.members[key] >= 10);
+    let n_members = Object.keys(this.members).length
     let n_active_members = Object.keys(active_members).length
-    console.log(n_members + ' members: ' + members);
+    console.log(n_members + ' members: ' + this.members);
     console.log(n_active_members + ' active members: ' + active_members);
     document.dispatchEvent(new Event('memberListLoaded'));
   }
@@ -326,7 +347,30 @@ class SignupSheet {
     //   fillInSuggestion(element);
     // }
   }
-  computeMeetingScores() {
-
+  computeMeetingScores(members) {
+    var short_names = Object.keys(members);
+    var meeting_points = {...members};
+    for(let name in meeting_points) {
+      meeting_points[name] = 0; // init as zero
+    }
+    for(var item in SCORES) {
+      var point = SCORES[item];
+      // Participants
+      // signupSheet.whois('Participants').trim().split(',');
+      var s = this.whois(item).trim();
+      if (s == 'TBA') {
+        continue;
+      }
+      s.split(',').forEach(function (name, index, array){
+        name = getFirstWord(name);
+        let r = short_names.indexOf(name);
+        if (r == -1) {
+          return '[' + item + ']:' + name + ' is not a member.(Check spelling?) ';
+        }
+        meeting_points[name] += point;
+        console.log(`add ${point} to ${name} for ${item}`)
+      });
+    }
+    return Object.values(meeting_points).join('\n');
   }
 }
