@@ -1,0 +1,3 @@
+windows file conflicts:
+
+git config core.fileMode false

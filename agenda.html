@@ -48,7 +48,43 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
 	</script>
 	<script type="text/javascript"  src="js/shuffle.js" ></script>
-	<script type="text/javascript"  src="js/agenda.js" ></script>
+	<script type="text/javascript"  src="js/load_meeting_info.js" ></script>
+	<script type="text/javascript">
+	var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
+	var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
+
+	$(document).ready(function() {
+	  // wait for all sheets are loaded
+		// first prepare listener
+		console.log("document is ready")
+	  var members_loaded = new Promise(function(resolve) {
+	      document.addEventListener("memberListLoaded",resolve,false);
+	  })
+	  var roles_loaded = new Promise(function(resolve) {
+	      document.addEventListener("signUpSheetLoaded", resolve, false);
+	  })
+		signupSheet = new SignupSheet();
+		toastiesSheet = new ToastiesSheet();
+		jQuery.getJSON(URL_SIGNUPSHEET, function(json) {signupSheet.loadJson(json) });
+		jQuery.getJSON(URL_TOASTIESSHEET, function(json) {toastiesSheet.loadJson(json) });
+
+	  Promise.all([members_loaded, roles_loaded]).then(function() {
+	      // after getting meeting col
+
+	    // get a fixed list of people and shuffle it
+	    // seed = Number(signupSheet.whois('Meeting #'));
+	    // console.log('seed:', seed);
+	    // shuffle(active_members, seed);
+
+	    let unavailable_members = signupSheet.unavailableMembers;
+	    // get assigned people
+	    signupSheet.fillInForm();
+	    // problem: if is empty, will go to next
+	    // highlight roles that have not been assigned
+	    // add presiding officer
+	  });
+	});
+	</script>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
@@ -102,8 +138,8 @@
 			Sciences Toastmasters</B></FONT></FONT></P>
 			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B><nobr id='whatIsDate'>TBA<nobr></B></FONT></FONT></P>
 			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>Meeting #<nobr id='meetingNo'>TBA<nobr></B></FONT></FONT>
-			<button onclick="prevMeeting()" >Prev</button>
-			<button onclick="nextMeeting()">Next</button>
+			<button onclick="signupSheet.prevMeeting()" >Prev</button>
+			<button onclick="signupSheet.nextMeeting()">Next</button>
 			</P>
 			<P ALIGN=RIGHT STYLE="background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B><nobr id="whichRoom">TBA<nobr>, 5:55pm</B></FONT></FONT><FONT FACE="Times New Roman, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>
 			</B></FONT></FONT>
