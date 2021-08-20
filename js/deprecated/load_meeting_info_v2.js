@@ -8,13 +8,12 @@ function getUrlVars() {
 }
 const getFirstWord = string => {
     const words = string.trim().split(' ');
-    return words[0];
-    // .toUpperCase();
-    // return words[0].toUpperCase();
+    return words[0].toUpperCase();
 };
 var INFO = {
 "#whatIsDate": "Date",
 "#meetingNo": "Meeting #",
+"#whoIsPresidingOfficer": "Presiding Officer",
 "#whichRoom": "Room",
 "#whatTheme": "Theme",
 "#whatWordOfTheDay": "Grammarian's Word of the Day",
@@ -24,7 +23,6 @@ var INFO = {
 // "#announcement": "annoucement",
 }
 var ROLES = {
-"#whoIsPresidingOfficer": "Presiding Officer", // 
 "#whoIsAhCounter": "Ah Counter.     (2 mins) ",
 "#whoIsToastmaster": "Toastmaster",
 "#whoIsGrammarian": "Grammarian     (2 mins)",
@@ -62,48 +60,10 @@ var SCORES = {
 };
 // removed table topic speakers. no need to track
 
-class SheetV4 {
-  constructor(spreadsheetId, sheetname=null) {
-    var json;
+class ToastiesSheet {
+  constructor() {
     console.log('---' + this.constructor.name);
-    var url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json`;
-    if (sheetname != null) {
-      url += '&sheet=' + sheetname
-    }
-    fetch(url)
-        .then(res => res.text())
-        .then(text => {
-            this.table = JSON.parse(text.substr(47).slice(0, -2)).table
-            document.dispatchEvent(new Event('loaded_'+this.constructor.name));
-    })
-    console.log('done')
   }
-  getColumn(col) { // return a dict: key: row title, value: column value
-    // if row title is duplicated, values will be joined with ','
-    var d_roles = {};
-    this.table.rows.forEach(row => {
-      let cell = row['c'][0];
-      if (cell != null) {
-        var key = cell.v
-        var val = row['c'][col];
-        if (val != null) {val = val.v}
-        if (key in d_roles) {
-          d_roles[key] +=  ',' + val;
-        } else {
-          d_roles[key] =  val;
-        }
-
-      }
-    })
-    console.log(d_roles)
-    return d_roles
-  }
-  getData(d, key) {
-    return (key in d) ? d[key] : null;
-  }
-}
-
-class ToastiesSheet extends SheetV4{
   loadJson(json) {
     // https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml
     // console.log('---' + this.constructor.name);
@@ -112,63 +72,119 @@ class ToastiesSheet extends SheetV4{
     console.log(this.data);
     console.log('---' + this.constructor.name);
     this.members = this.listMembers();
-    // let active_members = Object.keys(this.members).filter(key => this.members[key] >= 10);
-    // let n_members = Object.keys(this.members).length
-    // let n_active_members = Object.keys(active_members).length
-    // console.log(n_members + ' members: ' + this.members);
-    // console.log(n_active_members + ' active members: ' + active_members);
-    //
+    let active_members = Object.keys(this.members).filter(key => this.members[key] >= 10);
+    let n_members = Object.keys(this.members).length
+    let n_active_members = Object.keys(active_members).length
+    console.log(n_members + ' members: ' + this.members);
+    console.log(n_active_members + ' active members: ' + active_members);
+    document.dispatchEvent(new Event('memberListLoaded'));
   }
   // list members
   // find the cell and then get all following rows with col=0 and col1
   listMembers() {
-    // member and toastie scores...
-    // nick name --> full name and scores dictonary
-    var members = {};
-    this.table.rows.forEach(row => {
-      if (row['c'] != null) {
-        members[getFirstWord(row['c'][1]['v'])] = {
-          'full_name': row['c'][0]['v'],
-          'point': Number(row['c'][2]['v'])
-        }
+    let data = this.data;
+    let entry = this.data.feed.entry;
+    console.log('locating cell with the content being Total Points')
+    let text = 'Total Points'
+    var i;
+    for (i = 0; i < entry.length; i++) {
+      if(entry[i].content.$t.includes(text)) {
+        break;
       }
-    })
+    }
+    console.log('row: ' + i + '-content:' + entry[i].content.$t)
+
+    if (i == entry.length) {return 'ERROR'}
+    let row = entry[i].gs$cell.row;
+
+    // TODO: compute how many columns might be more efficient
+    var members = {};
+    for (let j = 1; entry[i+j]; j++) {
+      if(entry[i+j].gs$cell.col == 1) {
+        name = entry[i+j+1].content.$t; // column 'abbr'
+        let points = entry[i+j+2].content.$t; // column 'scores'
+        if(name == ''){
+          break;
+        }
+        console.log(name + ':' + points);
+        members[getFirstWord(name)] = Number(points);
+        j ++;
+      }
+    }
     return members;
   }
 }
 
 
-class SignupSheet extends SheetV4{
+class SignupSheet {
+  constructor() {
+
+  }
   loadJson(json) {
     // var url="https://docs.google.com/spreadsheet/pub?key=p_aHW5nOrj0VO2ZHTRRtqTQ&single=true&gid=0&range=A1&output=csv";
     // var url="https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
     console.log(json);
     this.data = json;
     this.entry = json.feed.entry;
+    // meeting_col = this.meetingCol();
+    document.dispatchEvent(new Event('signUpSheetLoaded'));
+    this._meetingCol = null;
+    this.assignedMembers = [];
   }
-  getMeetingCol() {
-    var date_row = this.table.rows[0].c;
-    var today = new Date();
-    var index, cell;
-    for ([index, cell] of date_row.entries()) {
-      let date = new Date(cell.v.trim());
-      if( today.getFullYear() === date.getFullYear() ) {
-        if (today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
-          break;
-        } // next month
-        else if (today.getMonth() < date.getMonth() ) {
-          break;
-        }
-      }  // next year
-      else if( today.getFullYear() < date.getFullYear()) {
-        break;
-      }
-    }
-    var meeting_col = index;
-    console.log(`meeting_col: ${meeting_col}`)
-    return meeting_col;
-  }
+  get meetingCol() { // cached
+    if (this._meetingCol == null) {
+      // console.log(whois('Date'));
+      // var meetingNo = '' +
+      // let j = 1;
+      // let i = 0;
+      var j = 1;
+      var i = 0;
+      var offset=1;
 
+      let entry = this.entry;
+      if (getUrlVars()["number"] == undefined) {
+        var today = new Date();
+        // show the coming meeting (or current meeting)
+
+        for (;i < entry.length; i++) {
+          if(entry[i].content.$t.trim() == 'Date') {
+            for (;j < 10; j++) {
+              let date = new Date(entry[i+j].content.$t.trim())
+              if( today.getFullYear() === date.getFullYear() ) {
+                if (today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
+                  break;
+                } // next month
+                else if (today.getMonth() < date.getMonth() ) {
+                    break;
+                }
+              }  // next year
+              else if( today.getFullYear() < date.getFullYear()) {
+                  break;
+              }
+            }
+            break;
+          }
+        }
+
+      } else {
+        let number = getUrlVars()["number"].trim()
+        for (i = 0; i < entry.length; i++) {
+          if(entry[i].content.$t.includes('Meeting #')) {
+            for (j = 1; j < 10; j++) {
+              if(entry[i+j].content.$t.trim() == number) {
+                  break;
+              }
+            }
+            break;
+          }
+        }
+      }
+      offset = j;
+      this._meetingCol = entry[i+j].gs$cell.col;
+      console.log('offset: ' + offset + ', meeting_col:' + this._meetingCol)
+    }
+    return this._meetingCol;
+  }
   // move the tab to the second
   nextMeeting() { // error if in another tab
     // var meeting_no = Number($('#meetingNo').text()) - 1;
@@ -212,16 +228,43 @@ class SignupSheet extends SheetV4{
   }
   // locate the cell
   whereis(text, strict=true) {
-    var result = this.getData(this.roles, text);
-    console.log(text)
-    console.log(result)
-    return (result == null)? 'TBA' : result;
+    let entry = this.entry;
+    text = text.trim();
+    // problemetic if there are empty cells
+    // for (let i = 0; i < entry.length; i++) {
+    //   if(entry[i].content.$t.includes(role)) {
+    //   return  entry[i+offset].content.$t;
+    //   }
+    // }
+    var i;
+    for (i = 0; i < entry.length; i++) {
+      if(strict && entry[i].content.$t.trim() == text) {
+        break;
+      }
+      if( !strict && entry[i].content.$t.includes(text)) {
+        break;
+      }
+      // console.log(entry[i].content.$t.trim())
+    }
+    if (i == entry.length) {return -1}
+    return i;
   }
   whois(role, strict=true) {
-    var result = this.getData(this.roles, role);
-    //get full name if possible
-    if(result in this.members) {result = this.members[result]['full_name']}
-    return (result == null)? 'TBA' : result;
+    let entry = this.entry;
+    var idx = this.cellIndex(role, strict);
+    if (idx == -1) {return 'TBA'; }
+    else {return entry[idx].content.$t;}
+  }
+  // not used?
+  getData(row, col) {
+    let entry = this.entry;
+    row = '' + row // to string
+    col = '' + col
+    for (let i = 0; i < entry.length; i++) {
+      if(entry[i].gs$cell.row == row && entry[i].gs$cell.col == col) {
+        return  entry[i].content.$t;
+      }
+    }
   }
   get unavailableMembers() {
     console.log('getting unavailable members..')
@@ -256,7 +299,7 @@ class SignupSheet extends SheetV4{
       this.assignedMembers.push(getFirstWord(who))
   }
   fillInInfo(role, element) {
-      let who = this.whereis(role);
+      let who = this.whois(role);
       console.log(element + ':' + who);
       $(element).html(who);
   }
@@ -268,9 +311,14 @@ class SignupSheet extends SheetV4{
       }
   }
   fillInForm() {
-    Object.entries(INFO).forEach(e => this.fillInInfo(e[1], e[0]))
-    this.assignedMembers = [];
-    Object.entries(ROLES).forEach(e => this.fillInRole(e[1], e[0]))
+    for(var element in INFO) {
+      this.fillInInfo(INFO[element], element);
+    }
+    for(var element in ROLES) {
+      var role = ROLES[element];
+      this.fillInRole(role, element);
+    }
+
     console.log('Assigned: ' + this.assignedMembers);
     // add those who already assigned
 
