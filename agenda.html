@@ -43,12 +43,18 @@
 	.closebtn:hover {
 	  color: black;
 	}
+	.ball {
+		position: absolute;
+		border-radius: 100%;
+		opacity: 0.7;
+	}
 	</STYLE>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js">
 	</script>
 	<script type="text/javascript"  src="js/shuffle.js" ></script>
 	<script type="text/javascript"  src="js/load_meeting_info.js" ></script>
+	<script type="text/javascript"  src="js/growth.js" ></script>
 	<script type="text/javascript">
 	var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
 	var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
@@ -82,6 +88,8 @@
 	    // problem: if is empty, will go to next
 	    // highlight roles that have not been assigned
 	    // add presiding officer
+			// let members = toastiesSheet.members;
+			// show_growth(members);
 	  });
 	});
 	</script>

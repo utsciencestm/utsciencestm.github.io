@@ -1,6 +1,5 @@
 <!--
 Early TM sign-up +1 // before ending the previous meeting
-
 Attending Meeting	+1
 Attending Social +1
 
@@ -26,11 +25,11 @@ Received Traveling Award +2
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
- 
+
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   <style>
-    .box { 
+    .box {
       display:inline-block;
       height: 100vh;
     }
@@ -60,7 +59,7 @@ Received Traveling Award +2
   <link rel="stylesheet" href="css/tooltip.css" type="text/css"/>
   <link rel="stylesheet" href="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006288/BBBootstrap/choices.min.css?version=7.0.0">
   <script src="https://res.cloudinary.com/dxfq3iotg/raw/upload/v1569006273/BBBootstrap/choices.min.js?version=7.0.0"></script>
-  
+
   <script type="text/javascript" src="js/bootstrap-multiselect.js"></script>
   <link rel="stylesheet" href="css/bootstrap-multiselect.css" type="text/css"/>
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -75,7 +74,7 @@ Received Traveling Award +2
     <!-- <iframe onload="this.width=0.4*screen.width;" src="./InputToastiesAwards.html" frameborder="0" scrolling="yes" height="100%vh" align="left"></iframe> -->
 
 
- <div class="container" style="overflow-y: scroll; height:100%; width:38vw"> 
+ <div class="container" style="overflow-y: scroll; height:100%; width:38vw">
  <!-- <div class="container">  -->
   <!-- width:38vw -->
     <!-- Content here -->
@@ -98,7 +97,7 @@ Received Traveling Award +2
 	  <button class="btn btn-primary" onclick="location.href = window.location.origin + '/ToastiesAwards.html' ">
 	    clear all
 	  </button>
-	  
+
 <!-- 	  Morbi leo risus</li>
 	  Porta ac consectetur ac</li>
 	  Vestibulum at eros</li> -->
@@ -106,7 +105,7 @@ Received Traveling Award +2
 	<div class="collapse multi-collapse" id="instructions" >
 		<div class="card card-body">
 			<div>
-	        <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.) 
+	        <strong>Step 0. </strong> Make sure to authorize this app first. (You only need to do this once.)
 	         <!--Add buttons to initiate auth sequence and sign out-->
 	         <!-- href="/googleSheets.html" target="_blank"  -->
 	        <a class="btn btn-sm btn-light" id="authorize_button" style="display: none;">Authorize</a>
@@ -131,7 +130,7 @@ Received Traveling Award +2
          LOAD
         </button>
         </div>
-       
+
 	  </div>
 	</div>
 
@@ -144,14 +143,14 @@ Received Traveling Award +2
          refresh the page
         </button>
         </div>
-       
+
 	  </div>
 	</div>
 
 
 
     <form onchange="addPeopleAbove()">
-      
+
 
 
       <div class="form-group row">
@@ -204,11 +203,11 @@ Received Traveling Award +2
 
       <div class="form-group row">
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Evaluator 
+        <label for="inputPassword" class="col-sm-2 col-form-label">Evaluator
           <span class="badge">+1</span>
           <span><i data-content="Please include the TableTopic evalutor as well!" class="fa fa-exclamation-circle"></i></span>
         </label>
-        
+
         <div class="col-sm-10">
           <select id="evaluator" class="selectLimit3" multiple onchange="updateSelect(this, '#bestEvaluator')">
           </select>
@@ -225,7 +224,7 @@ Received Traveling Award +2
 	          </select>
 	        </div>
 	      </div>
-	     
+
 	      <div class="col-sm">
 		        <!-- best speaker select from one of three speakers -->
 		        <label for="inputPassword" class="col-sm-2 col-form-label">Best Table Topics <span class="badge">+2</span> </label>
@@ -260,7 +259,7 @@ Received Traveling Award +2
       <hr>
 
       <div class="form-group row">
-        <label for="inputPassword" class="col-sm-2 col-form-label">Participants <span class="badge">+1</span> </label> 
+        <label for="inputPassword" class="col-sm-2 col-form-label">Participants <span class="badge">+1</span> </label>
         <!-- <button class='btn-primary btn-sm' onclick=" addPeopleAbove(); return false;">Add people above</button> -->
         <div class="col-sm-10">
           <!-- <select id="participants" class="selectMulti" multiple>
@@ -282,7 +281,7 @@ Received Traveling Award +2
         <div class="col-sm-10">
 
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span> 
+        <label for="inputPassword" class="col-sm-2 col-form-label">Early TM sign-up <span class="badge">+1</span>
         <span><i data-content="Sign-up when Adi pull out the sheet for supporting roles of the next meeting" class="fa fa-question-circle"></i></span>
         </label>
         <div class="col-sm-10">
@@ -294,7 +293,7 @@ Received Traveling Award +2
         <div class="col-sm-10">
 
         <!-- best speaker select from one of three speakers -->
-        <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span> 
+        <label for="inputPassword" class="col-sm-2 col-form-label">Member Sign-up <span class="badge">+4</span>
           <span><i data-content="who brings a new club member" class="fa fa-question-circle"></i></span>
         </label>
         <div class="col-sm-10">
@@ -305,7 +304,7 @@ Received Traveling Award +2
 
         <div class="col-sm-10">
 	        <!-- best speaker select from one of three speakers -->
-	        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social 
+	        <label for="inputPassword" class="col-sm-2 col-form-label">Attending Social
             <span class="badge">+1</span>
             <span><i data-content="We have a social event after each meeting" class="fa fa-question-circle"></i></span>
           </label>
@@ -420,7 +419,7 @@ Received Traveling Award +2
 
   </div>
 
-  
+
   <div class="box">
     <!-- view only -->
     <!-- <iframe onload="this.width=0.55*screen.width;" frameborder="0" scrolling="no" height="100%vh" align="left" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQ3Viig2-DlkSkufg6xBK6IdVRFJR2pwkUmq0NzyfOIAi3cCdCkGuf8ZARUa3HoF2Il17WKvOA7pomh/pubhtml?widget=true&amp;headers=false"></iframe> -->
