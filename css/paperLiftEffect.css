@@ -4,6 +4,8 @@ body {
   padding: 0;
   background: #efefef;
 }
+.box {
+}
 @media screen and (min-width: 768px) {
   body {
     margin: 0;
@@ -58,11 +60,14 @@ body {
 }
 @media screen and (max-width: 768px) {
   body {
-    max-width: 500px;
-    padding-left: 30px;
+    width: auto;
+    padding-left: 10px;
+    padding-right: 30px;
     padding-top: 30px;
     margin: auto;
-    background: #ffffff;
+  }
+  p {
+    font-size: 9pt;
   }
   .box {
   }
