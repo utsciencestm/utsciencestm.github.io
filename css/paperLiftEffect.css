@@ -2,7 +2,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #efefef;
+  background: #ffffff;
 }
 .box {
 }
@@ -15,7 +15,7 @@ body {
   .box {
     position: relative;
     padding: 50px;
-    padding-right: 0px;
+    padding-right: 60px;
     padding-left: 60px;
     margin: 40px auto;
     width: 500px;
@@ -57,18 +57,30 @@ body {
   .box:hover::after {
     right: 5px;
   }
+  #boxtitle {
+    width: 700px;
+  }
 }
 @media screen and (max-width: 768px) {
   body {
     width: auto;
     padding-left: 10px;
-    padding-right: 30px;
+
     padding-top: 30px;
     margin: auto;
   }
   p {
     font-size: 9pt;
+    background: #ffffff;
   }
   .box {
+
+  }
+  #boxtitle {
+    width: 200px;
+  }
+  #maintable {
+    width: 100%;
+    padding-right: 10px;
   }
 }
