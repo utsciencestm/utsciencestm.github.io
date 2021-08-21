@@ -1,11 +1,25 @@
-
 body {
-  margin: 0;
-  padding: 0;
+  width: auto;
+  padding-left: 10px;
+  padding-top: 30px;
+  margin: auto;
+}
+p {
+  font-size: 9pt;
   background: #ffffff;
 }
 .box {
+
 }
+#boxtitle {
+  align: center;
+}
+#maintable {
+  width: 100%;
+  padding-right: 10px;
+}
+
+
 @media screen and (min-width: 768px) {
   body {
     margin: 0;
@@ -56,31 +70,5 @@ body {
 
   .box:hover::after {
     right: 5px;
-  }
-  #boxtitle {
-    width: 700px;
-  }
-}
-@media screen and (max-width: 768px) {
-  body {
-    width: auto;
-    padding-left: 10px;
-
-    padding-top: 30px;
-    margin: auto;
-  }
-  p {
-    font-size: 9pt;
-    background: #ffffff;
-  }
-  .box {
-
-  }
-  #boxtitle {
-    width: 200px;
-  }
-  #maintable {
-    width: 100%;
-    padding-right: 10px;
   }
 }
