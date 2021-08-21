@@ -53,8 +53,9 @@
 	<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"> -->
 	</script>
 	<script type="text/javascript"  src="js/shuffle.js" ></script>
+	<script type="text/javascript"  src="js/date.js" ></script>
 	<script type="text/javascript"  src="js/load_meeting_info.js" ></script>
-	<script type="text/javascript"  src="js/growth.js" ></script>
+	<!-- <script type="text/javascript"  src="js/growth.js" ></script> -->
 	<script type="text/javascript">
 	// var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
 	// var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
@@ -72,7 +73,13 @@
 var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
 var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
 var toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
-var signupSheet = new SignupSheet(SIGNUPSHEET_ID, "Aug+%2721-Sept+%2721");
+var date = getUrlVars()["date"]
+// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
+const today = (date == undefined)? new Date() : new Date(date);
+console.log(`today: ${today}`)
+var sheetname = SignupSheet.getMeetingSheetName(today);
+console.log(`sheetname: ${sheetname}`)
+var signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
 	$(document).ready(function() {
 	  // wait for all sheets are loaded
 		// first prepare listener
@@ -87,8 +94,11 @@ var signupSheet = new SignupSheet(SIGNUPSHEET_ID, "Aug+%2721-Sept+%2721");
 
 	  Promise.all([members_loaded, roles_loaded]).then(function() {
 	      // after getting meeting col
+				let today = (date == undefined)? new Date() : new Date(date);
 				toastiesSheet.members = toastiesSheet.listMembers();
-				signupSheet.meetingCol = signupSheet.getMeetingCol();
+				console.log(`today: ${today}`)
+				signupSheet.meetingCol = signupSheet.getMeetingCol(today);
+				console.log(`today: ${today}`)
 				signupSheet.members = toastiesSheet.members;
 				signupSheet.roles = signupSheet.getColumn(signupSheet.meetingCol);
 				console.log(toastiesSheet.members)
@@ -161,7 +171,9 @@ var signupSheet = new SignupSheet(SIGNUPSHEET_ID, "Aug+%2721-Sept+%2721");
 		<TD WIDTH=269 STYLE="border: none; padding: 0in">
 			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial Black, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>UT
 			Sciences Toastmasters</B></FONT></FONT></P>
-			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B><nobr id='whatIsDate'>TBA<nobr></B></FONT></FONT></P>
+			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B><nobr id='whatIsDate'>TBA<nobr></B></FONT></FONT>
+				<button onclick="signupSheet.throwback2020()" >#throwback2020</button>
+			</P>
 			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>Meeting #<nobr id='meetingNo'>TBA<nobr></B></FONT></FONT>
 			<button onclick="signupSheet.prevMeeting()" >Prev</button>
 			<button onclick="signupSheet.nextMeeting()">Next</button>

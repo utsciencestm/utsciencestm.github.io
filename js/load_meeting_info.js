@@ -1,3 +1,16 @@
+/*
+New features:
+
+- go to any date
+- What we did last year (last year ) throwback2020 throwback2019
+- canceled big font
+
+https://stackoverflow.com/questions/1643320/get-month-name-from-date
+const date = new Date(2009, 10, 10);  // 2009-11-10
+const month = date.toLocaleString('default', { month: 'short' });
+console.log(month);
+*/
+
 // https://html-online.com/articles/get-url-parameters-javascript/
 function getUrlVars() {
     var vars = {};
@@ -12,6 +25,7 @@ const getFirstWord = string => {
     // .toUpperCase();
     // return words[0].toUpperCase();
 };
+
 var INFO = {
 "#whatIsDate": "Date",
 "#meetingNo": "Meeting #",
@@ -24,8 +38,8 @@ var INFO = {
 // "#announcement": "annoucement",
 }
 var ROLES = {
-"#whoIsPresidingOfficer": "Presiding Officer", // 
-"#whoIsAhCounter": "Ah Counter.     (2 mins) ",
+"#whoIsPresidingOfficer": "Presiding Officer", //
+"#whoIsAhCounter": "Ah Counter.     (2 mins)",
 "#whoIsToastmaster": "Toastmaster",
 "#whoIsGrammarian": "Grammarian     (2 mins)",
 "#whoIsTimeKeeper": "Time Keeper",
@@ -34,7 +48,8 @@ var ROLES = {
 "#whoIsSpeaker2": "Speaker # 2",
 "#whoIsSpeaker3": "Speaker # 3",
 "#whoIsGeneralEvaluator": "General Evaluator",
-"#whoIsTableTopicsEvaluator": "TableTopics Evaluator (2-3 mins)",
+// "#whoIsTableTopicsEvaluator": "TableTopics Evaluator (2-3 mins)",
+"#whoIsTableTopicsEvaluator": "TableTopics Evaluator (3-4 mins)",
 "#whoIsEvaluator1": "Evaluator # 1 (2-3 mins)",
 "#whoIsEvaluator2": "Evaluator # 2 (2-3 mins)",
 "#whoIsEvaluator3": "Evaluator # 3 (2-3 mins)",
@@ -80,19 +95,23 @@ class SheetV4 {
   }
   getColumn(col) { // return a dict: key: row title, value: column value
     // if row title is duplicated, values will be joined with ','
+    console.log('getColumn ---- ')
+    var col = parseInt(col)
     var d_roles = {};
-    this.table.rows.forEach(row => {
-      let cell = row['c'][0];
+    this.table.rows.forEach( row => {
+      let cell = row.c[0];
       if (cell != null) {
-        var key = cell.v
-        var val = row['c'][col];
-        if (val != null) {val = val.v}
+        var key = cell.v.trim(); // important
+        var val = (row.c[col]!= null)? row.c[col].v: null;
+        if (val != null) {val = val.trim();}
         if (key in d_roles) {
           d_roles[key] +=  ',' + val;
         } else {
-          d_roles[key] =  val;
+          d_roles[key] =   val;
+          console.log(key + ':' + val);
         }
-
+      } else {
+        console.log('cell is null');
       }
     })
     console.log(d_roles)
@@ -128,7 +147,12 @@ class ToastiesSheet extends SheetV4{
     this.table.rows.forEach(row => {
       if (row['c'] != null) {
         members[getFirstWord(row['c'][1]['v'])] = {
-          'full_name': row['c'][0]['v'],
+          'full_name': row['c'][0]['v'].split(',')[0],
+          'point': Number(row['c'][2]['v'])
+        }
+        // also allow using the first name only
+        members[getFirstWord(row['c'][0]['v'])] = {
+          'full_name': row['c'][0]['v'].split(',')[0],
           'point': Number(row['c'][2]['v'])
         }
       }
@@ -146,21 +170,54 @@ class SignupSheet extends SheetV4{
     this.data = json;
     this.entry = json.feed.entry;
   }
-  getMeetingCol() {
+  // 3
+  static getMeetingSheetName(date) {
+    let m = date.getMonth();
+    let y = date.getFullYear().toString().slice(2); // "09"
+    if (m%2 != 0) {
+      var makeDate = date.addMonths(1);
+      // var makeDate = date;
+      // new Date(makeDate.setMonth(makeDate.getMonth() + 1));
+      let m2 = makeDate.getMonth();
+      let y2 = makeDate.getFullYear().toString().slice(2);
+      return monthNames[m] + "'" + y +  "-" + monthNames[(m+1)%12] + "'" + y2;
+    }
+    else {
+      // this will mess up today object...
+      // var makeDate = date;
+      // makeDate = new Date(makeDate.setMonth(makeDate.getMonth() - 1));
+      var makeDate = date.addMonths(-1);
+      let m2 = makeDate.getMonth();
+      let y2 = makeDate.getFullYear().toString().slice(2);
+      return monthNames[(m-1)%12] + "'" + y2 +  "-" + monthNames[m] + "'" + y;
+    }
+  }
+  getMeetingCol(date) {
     var date_row = this.table.rows[0].c;
-    var today = new Date();
+    let date_now = date.getDateWithoutTime();
+    this.date = date_now;
     var index, cell;
     for ([index, cell] of date_row.entries()) {
-      let date = new Date(cell.v.trim());
-      if( today.getFullYear() === date.getFullYear() ) {
-        if (today.getMonth() === date.getMonth() && today.getDate() <= date.getDate()) {
+      if(index==0){continue}
+      if(cell==null){continue}
+      if(cell.v==null){continue}
+      let date = ('f' in cell)? new Date(eval(cell.v)) : new Date(cell.v.trim());
+      // console.log(cell)
+      // console.log(date)
+      if( date_now.getFullYear() === date.getFullYear() ) {
+        if (date_now.getMonth() === date.getMonth() && date_now.getDate() <= date.getDate()) {
+          console.log('getMeetingCol:break1')
+          console.log(date_now)
+          console.log(date)
           break;
         } // next month
-        else if (today.getMonth() < date.getMonth() ) {
+        else if (date_now.getMonth() < date.getMonth() ) {
+          console.log('getMeetingCol:break2')
           break;
         }
       }  // next year
-      else if( today.getFullYear() < date.getFullYear()) {
+      else if( date_now.getFullYear() < date.getFullYear()) {
+        console.log('getMeetingCol:break3')
         break;
       }
     }
@@ -168,33 +225,21 @@ class SignupSheet extends SheetV4{
     console.log(`meeting_col: ${meeting_col}`)
     return meeting_col;
   }
-
-  // move the tab to the second
-  nextMeeting() { // error if in another tab
-    // var meeting_no = Number($('#meetingNo').text()) - 1;
-    let entry = this.entry;
-    var i = this.cellIndex('Meeting #');
-    if (i == entry.length) {return 'ERROR'}
-    if(entry[i+1].gs$cell.row == entry[i].gs$cell.row ) {
-      let meeting_no = Number(entry[i+1].content.$t)
-      location.href = window.location.origin + '/agenda.html?number='+meeting_no;
-      console.log(location.href)
-    } else {
-      alert('Not found! Create a new tab and put it as the second tab in the sign up sheet.')
-    }
+  nextMeeting() {
+    location.href = window.location.origin + '/agenda.html?date='+this.date.addDays(8).yyyymmdd();
+    console.log(location.href)
+    return false
+  }
+  throwback2020() {
+    let url = window.location.origin + '/agenda.html?date='+this.date.addYears(-1).yyyymmdd();
+    location.replace(url)
+    // console.log(location.href)
     return false
   }
   prevMeeting() {
-    let entry = this.entry;
-    var i = this.cellIndex('Meeting #');
-    if (i == entry.length) {return 'ERROR'}
-    if(entry[i-1].gs$cell.col > 1) {
-      let meeting_no = Number(entry[i-1].content.$t);
-      location.href = window.location.origin + '/agenda.html?number='+meeting_no;
-      console.log(location.href)
-    } else {
-      alert('The last meeting has been archived.');
-    }
+    let url = window.location.origin + '/agenda.html?date='+this.date.addDays(-7).yyyymmdd();
+    // console.log(location.href)
+    location.replace(url)
     return false
   }
   cellIndex(role, strict=true) {
@@ -213,14 +258,21 @@ class SignupSheet extends SheetV4{
   // locate the cell
   whereis(text, strict=true) {
     var result = this.getData(this.roles, text);
-    console.log(text)
-    console.log(result)
+    // console.log(text)
+    // console.log(result)
     return (result == null)? 'TBA' : result;
   }
   whois(role, strict=true) {
     var result = this.getData(this.roles, role);
+    if(result != null) {result = getFirstWord(result);}
+    else {
+      if(role=='Presiding Officer') {
+        result = (this.date.getFullYear()==2020)? 'Arushi':'';
+      }
+    }
     //get full name if possible
-    if(result in this.members) {result = this.members[result]['full_name']}
+    // dangerous: result = this.members[result]['full_name']
+    if(result in this.members) {return this.members[result]['full_name']}
     return (result == null)? 'TBA' : result;
   }
   get unavailableMembers() {
@@ -253,10 +305,13 @@ class SignupSheet extends SheetV4{
       let who = this.whois(role);
       console.log(element + ':' + who);
       $(element).html(who);
-      this.assignedMembers.push(getFirstWord(who))
+      if (who!='TBA') {
+        this.assignedMembers.push(getFirstWord(who))
+      }
   }
   fillInInfo(role, element) {
-      let who = this.whereis(role);
+      let s = this.whereis(role);
+      let who = s.includes('Date(')? (new Date(eval(s))).getDateWithoutTime().addDays(-1).yyyymmdd() : s;
       console.log(element + ':' + who);
       $(element).html(who);
   }
