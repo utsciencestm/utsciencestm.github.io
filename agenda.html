@@ -70,17 +70,19 @@
 // 		}
 // 	}
 // }
-var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
-var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
-var toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
-var date = getUrlVars()["date"]
-// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
-const today = (date == undefined)? new Date() : new Date(date);
-console.log(`today: ${today}`)
-var sheetname = SignupSheet.getMeetingSheetName(today);
-console.log(`sheetname: ${sheetname}`)
-var signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
+var signupSheet;
+var toastiesSheet;
 	$(document).ready(function() {
+		var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
+		var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
+		toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
+		var date = getUrlVars()["date"]
+		// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
+		const today = (date == undefined)? new Date() : new Date(date);
+		console.log(`today: ${today}`)
+		var sheetname = SignupSheet.getMeetingSheetName(today);
+		console.log(`sheetname: ${sheetname}`)
+		signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
 	  // wait for all sheets are loaded
 		// first prepare listener
 		console.log("document is ready")
@@ -177,6 +179,7 @@ var signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname))
 			<P ALIGN=RIGHT STYLE="margin-bottom: 0.03in; background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>Meeting #<nobr id='meetingNo'>TBA<nobr></B></FONT></FONT>
 			<button onclick="signupSheet.prevMeeting()" >Prev</button>
 			<button onclick="signupSheet.nextMeeting()">Next</button>
+			<button onclick="signupSheet.thisMeeting()">Today</button>
 			</P>
 			<P ALIGN=RIGHT STYLE="background: #ffffff"><FONT FACE="Arial, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B><nobr id="whichRoom">TBA<nobr>, 5:55pm</B></FONT></FONT><FONT FACE="Times New Roman, serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>
 			</B></FONT></FONT>
@@ -194,7 +197,7 @@ var signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname))
 		</TD>
 	</TR>
 </TABLE>
-<TABLE WIDTH=432 CELLPADDING=7 CELLSPACING=0>
+<TABLE id='maintable' WIDTH=432 CELLPADDING=7 CELLSPACING=0>
 	<COL WIDTH=41>
 	<COL WIDTH=226>
 	<COL WIDTH=4366>

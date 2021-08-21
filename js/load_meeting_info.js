@@ -194,14 +194,15 @@ class SignupSheet extends SheetV4{
   }
   getMeetingCol(date) {
     var date_row = this.table.rows[0].c;
-    let date_now = date.getDateWithoutTime();
+    let date_now = date.getDateWithoutTime().addDays(1); // so weird
     this.date = date_now;
     var index, cell;
     for ([index, cell] of date_row.entries()) {
       if(index==0){continue}
       if(cell==null){continue}
       if(cell.v==null){continue}
-      let date = ('f' in cell)? new Date(eval(cell.v)) : new Date(cell.v.trim());
+      let date = ('f' in cell)? (new Date(eval(cell.v)).addDays(-1)) : new Date(cell.v.trim());
+      console.log(`compare ${date.yyyymmdd()} and ${date_now.yyyymmdd()}`)
       // console.log(cell)
       // console.log(date)
       if( date_now.getFullYear() === date.getFullYear() ) {
@@ -226,8 +227,16 @@ class SignupSheet extends SheetV4{
     return meeting_col;
   }
   nextMeeting() {
-    location.href = window.location.origin + '/agenda.html?date='+this.date.addDays(8).yyyymmdd();
-    console.log(location.href)
+    // not working properly
+    // location.href = window.location.origin + '/agenda.html?date='+this.date.addDays(8).yyyymmdd();
+    // console.log(location.href)
+    let url = window.location.origin + '/agenda.html?date='+this.date.addDays(8).yyyymmdd();
+    location.replace(url)
+    return false
+  }
+  thisMeeting() {
+    let url = window.location.origin + '/agenda.html';
+    location.replace(url)
     return false
   }
   throwback2020() {
@@ -324,6 +333,9 @@ class SignupSheet extends SheetV4{
   }
   fillInForm() {
     Object.entries(INFO).forEach(e => this.fillInInfo(e[1], e[0]))
+    if(this.whereis('Theme').trim().toUpperCase()=='CANCELED') {
+      $("#maintable").hide();
+    }
     this.assignedMembers = [];
     Object.entries(ROLES).forEach(e => this.fillInRole(e[1], e[0]))
     console.log('Assigned: ' + this.assignedMembers);
