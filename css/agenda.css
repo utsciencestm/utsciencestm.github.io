@@ -6,10 +6,17 @@
     z-index: 100;
     position: fixed;
   }
-  .floating-menu a, 
+  .floating-menu a,
   .floating-menu h3 {
     font-size: 0.9em;
     display: block;
     margin: 0 0.5em;
     color: white;
   }
+
+@media screen and (max-width: 768px) {
+  .floating-menu {
+    display: none;
+    visibility:hidden;
+  }
+}
