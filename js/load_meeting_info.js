@@ -146,14 +146,20 @@ class ToastiesSheet extends SheetV4{
     var members = {};
     this.table.rows.forEach(row => {
       if (row['c'] != null) {
-        members[getFirstWord(row['c'][1]['v'])] = {
-          'full_name': row['c'][0]['v'].split(',')[0],
-          'point': Number(row['c'][2]['v'])
+        if(row['c'][1]!=null) {
+          members[getFirstWord(row['c'][1]['v'])] = {
+            'full_name': ((row['c'][0]!=null)? row['c'][0]['v'].split(',')[0] : row['c'][1].v),
+            'point': Number(row['c'][2]['v']),
+            'email': ((row['c'][3]!=null)? row['c'][3]['v'] : '')
+          }
         }
-        // also allow using the first name only
-        members[getFirstWord(row['c'][0]['v'])] = {
-          'full_name': row['c'][0]['v'].split(',')[0],
-          'point': Number(row['c'][2]['v'])
+        if(row['c'][0]!=null) {
+          // also allow using the first name only
+          members[getFirstWord(row['c'][0]['v'])] = {
+            'full_name': row['c'][0]['v'].split(',')[0],
+            'point': Number(row['c'][2]['v']),
+            'email': ((row['c'][3]!=null)? row['c'][3]['v'] : '')
+          }
         }
       }
     })
