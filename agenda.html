@@ -73,14 +73,16 @@
 // }
 var signupSheet;
 var toastiesSheet;
+var date = getUrlVars()["date"]
+var today = (date == undefined)? new Date() : new Date(date);
+today = today.getDateWithoutTime()
+console.warn(`today: ${today}`)
+
 	$(document).ready(function() {
 		var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
 		var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
 		toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
-		var date = getUrlVars()["date"]
-		// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
-		const today = (date == undefined)? new Date() : new Date(date);
-		console.log(`today: ${today}`)
+
 		var sheetname = SignupSheet.getMeetingSheetName(today);
 		console.log(`sheetname: ${sheetname}`)
 		signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
@@ -94,10 +96,9 @@ var toastiesSheet;
 	      document.addEventListener("loaded_SignupSheet", resolve, false);
 	  })
 
-
 	  Promise.all([members_loaded, roles_loaded]).then(function() {
 	      // after getting meeting col
-				let today = (date == undefined)? new Date() : new Date(date);
+				// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
 				toastiesSheet.members = toastiesSheet.listMembers();
 				console.log(`today: ${today}`)
 				signupSheet.meetingCol = signupSheet.getMeetingCol(today);
