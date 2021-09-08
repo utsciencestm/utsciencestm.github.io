@@ -76,6 +76,8 @@ var SCORES = {
 "Member Sign-up": 4,
 "Time Keeper": 1,
 "Vote Counter": 1,
+"In-person Participants": 1,
+"Virtual Participants": 0.3,
 "Grammarian     (2 mins)": 1,
 "Ah Counter.     (2 mins)": 1,
 };
@@ -269,15 +271,21 @@ class SignupSheet extends SheetV4{
     for (let col=1; col<=this.meetingCol; col++) {
       let roles = this.getColumn(col);
       let li_items = '';
+      // SCORES
       for (let [key, value] of Object.entries(roles)) {
-        if(value == member) {
-          console.warn(`${key}: ${value}`);
-          if (key in SCORES) {
-            points += SCORES[key];
-            li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
-              ${key.split('(')[0]}
-            </li>`;
+        if (key in SCORES) {
+          if(value != null) {
+            for(let item of value.split(",")) {
+              if(member == getFirstWord(item.trim()) ){
+                // Ad in Adi
+                console.warn(`${key}: ${item}`);
+                points += SCORES[key];
+                li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
+                  ${key.split('(')[0]}
+                </li>`;
+              }
+            }
           }
         }
       }
@@ -320,15 +328,24 @@ class SignupSheet extends SheetV4{
   }
   whois(role, strict=true) {
     var result = this.getData(this.roles, role);
-    if(result != null) {result = getFirstWord(result);}
-    else {
+    // if(result != null) {result = getFirstWord(result);}
+    // else {
       if(role=='Presiding Officer') {
         result = (this.date.getFullYear()==2020)? 'Arushi':'';
-      }
+      // }
     }
     //get full name if possible
     // dangerous: result = this.members[result]['full_name']
     return (result == null)? 'TBA' : result;
+  }
+  who_is_in(role) {
+    let s = whois(role);
+    let result = [];
+    for ( let item of s.split(",") ){
+      let short_name = getFirstWord(item.trim());
+      result.push(short_name);
+    }
+    return result;
   }
   get unavailableMembers() {
     console.log('getting unavailable members..')
@@ -360,16 +377,21 @@ class SignupSheet extends SheetV4{
       let who = this.whois(role);
       console.log(element + ':' + who);
       // $(element).html(who);
-      if (who in this.members) {
-        let fullname = (who in this.members)? this.members[who]['full_name'] : who;
-        $(element).html(`
-          <a href="/timeline.html?member=${who}">
-            ${fullname}
-          </a>`);
-        this.assignedMembers.push(getFirstWord(fullname))
-      } else {
-        $(element).html(`TBA`);
+      let result = '';
+      for ( let item of who.split(",") ){
+        let short_name = getFirstWord(item.trim());
+        if (short_name in this.members) {
+          let fullname = this.members[short_name]['full_name'];
+          result += `
+            <a href="/timeline.html?member=${short_name}">
+              ${fullname}
+            </a><br/>`;
+          this.assignedMembers.push(short_name)
+        } else {
+          result += short_name;
+        }
       }
+      $(element).html( (result=='')?`TBA`:result);
   }
   fillInInfo(role, element) {
       let s = this.whereis(role);
