@@ -363,9 +363,8 @@ class SignupSheet extends SheetV4{
     var result = this.getData(this.roles, role);
     // if(result != null) {result = getFirstWord(result);}
     // else {
-      if(role=='Presiding Officer') {
-        result = (this.date.getFullYear()==2020)? 'Arushi':'';
-      // }
+    if(role=='Presiding Officer') {
+      result = (this.date.getFullYear()==2020)? 'Arushi':result;
     }
     //get full name if possible
     // dangerous: result = this.members[result]['full_name']
