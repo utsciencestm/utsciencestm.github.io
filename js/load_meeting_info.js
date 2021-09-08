@@ -74,6 +74,8 @@ var SCORES = {
 "Best Evaluator": 2,
 "Traveling Award": 2,
 "Member Sign-up": 4,
+"Grammarian     (2 mins)": 1,
+"Ah Counter.     (2 mins)": 1,
 };
 // removed table topic speakers. no need to track
 
@@ -256,6 +258,29 @@ class SignupSheet extends SheetV4{
     // console.log(location.href)
     location.replace(url)
     return false
+  }
+  getMemberTimeline(member, roles) {
+    let li_items = '';
+    for (let [key, value] of Object.entries(signupSheet.roles)) {
+      if(value == member) {
+        console.warn(`${key}: ${value}`);
+        li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+        <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
+          ${key}
+        </li>`;
+      }
+    }
+    return `
+    <div class="timeline-item">
+      <div class="timeline-img"></div>
+      <div class="timeline-content js--fadeInLeft">
+        <h2 align=center>${roles['Theme']}</h2>
+        <div class="date">${roles['Date']}</div>
+        <ul class="list-group">
+          ${li_items}
+        </ul>
+      </div>
+    </div>`
   }
   cellIndex(role, strict=true) {
     let entry = this.entry;

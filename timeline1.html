@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Vertical Timeline</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100i,300,400,500,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Allura" rel="stylesheet">
+
+  <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+
+      <link rel="stylesheet" href="css/style.css">
+
+      <!-- script starts here -->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    	<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"> -->
+    	</script>
+    	<script type="text/javascript"  src="js/shuffle.js" ></script>
+    	<script type="text/javascript"  src="js/date.js" ></script>
+    	<script type="text/javascript"  src="js/load_meeting_info.js" ></script>
+    	<!-- <script type="text/javascript"  src="js/growth.js" ></script> -->
+    	<script type="text/javascript">
+    	// var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
+    	// var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
+    // old api is inconvenient because it skips empty cells and don't allow accessing via sheetname (sheet index is needed, so we put the sheet always the second sheets)
+    // getData(row, col) {
+    // 	let entry = this.entry;
+    // 	row = '' + row // to string
+    // 	col = '' + col
+    // 	for (let i = 0; i < entry.length; i++) {
+    // 		if(entry[i].gs$cell.row == row && entry[i].gs$cell.col == col) {
+    // 			return  entry[i].content.$t;
+    // 		}
+    // 	}
+    // }
+    var signupSheet;
+    var toastiesSheet;
+    var member = "Shaheer"; // 'Zoe'; // getUrlVars()["member"]
+    var today = new Date();
+    today = today.getDateWithoutTime()
+    console.warn(`today: ${today}`)
+
+    	$(document).ready(function() {
+    		var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
+    		var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
+    		toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
+
+    		var sheetname = SignupSheet.getMeetingSheetName(today);
+    		console.log(`sheetname: ${sheetname}`)
+    		signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
+    	  // wait for all sheets are loaded
+    		// first prepare listener
+    		console.log("document is ready")
+    	  var members_loaded = new Promise(function(resolve) {
+    	      document.addEventListener("loaded_ToastiesSheet",resolve,false);
+    	  })
+    	  var roles_loaded = new Promise(function(resolve) {
+    	      document.addEventListener("loaded_SignupSheet", resolve, false);
+    	  })
+
+    	  Promise.all([members_loaded, roles_loaded]).then(function() {
+    	      // after getting meeting col
+    				// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
+    				toastiesSheet.members = toastiesSheet.listMembers();
+    				console.log(`today: ${today}`)
+    				signupSheet.meetingCol = signupSheet.getMeetingCol(today);
+    				console.log(`today: ${today}`)
+    				signupSheet.members = toastiesSheet.members;
+    				signupSheet.roles = signupSheet.getColumn(signupSheet.meetingCol);
+
+            // first, only compute points for today
+            // scan this person, if in role, get points
+    				// console.warn(signupSheet.roles)
+    				// console.log(toastiesSheet.members)
+    				// console.log(signupSheet.meetingCol)
+
+            for (let [key, value] of Object.entries(signupSheet.roles)) {
+              if(value == member) {
+                console.warn(`${key}: ${value}`);
+              }
+            }
+
+    	  });
+    	});
+    	</script>
+
+      <!-- script ends here -->
+
+</head>
+
+<body>
+  <header>
+    <div class="container text-center">
+      <h1>Vertical Timeline</h1>
+      <p>Sava Lazic</p>
+    </div>
+  </header>
+
+  <section class="timeline">
+
+    <div class="container">
+      <div class="timeline-item">
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+          <h2>Title</h2>
+       		<div class="date">1 MAY 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Cras justo odio
+              <span class="badge badge-primary badge-pill">+14</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Dapibus ac facilisis in
+              <span class="badge badge-primary badge-pill">+2</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Morbi leo risus
+              <span class="badge badge-primary badge-pill">+1</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+        	<div class="timeline-img-header">
+          	<h2>Card Title</h2>
+        	</div>
+        	<div class="date">25 MAY 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+        	<div class="date">3 JUN 2016</div>
+          <h2>Quote</h2>
+          <blockquote>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta explicabo debitis omnis dolor iste fugit totam quasi inventore!</blockquote>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInRight">
+        	<h2>Title</h2>
+        	<div class="date">22 JUN 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInLeft">
+        	<div class="timeline-img-header">
+          	<h2>Card Title</h2>
+        	</div>
+        	<div class="date">10 JULY 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+        	<div class="timeline-img-header">
+          	<h2>Card Title</h2>
+        	</div>
+        	<div class="date">30 JULY 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+        	<div class="date">5 AUG 2016</div>
+          <h2>Quote</h2>
+          <blockquote>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta explicabo debitis omnis dolor iste fugit totam quasi inventore!</blockquote>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+        	<div class="timeline-img-header">
+          	<h2>Card Title</h2>
+        	</div>
+        	<div class="date">19 AUG 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+        	<div class="date">1 SEP 2016</div>
+          <h2>Title</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+          <div class="timeline-img-header">
+            <h2>Card Title</h2>
+          </div>
+          <div class="date">19 AUG 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+          <div class="date">1 SEP 2016</div>
+          <h2>Title</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+          <div class="timeline-img-header">
+            <h2>Card Title</h2>
+          </div>
+          <div class="date">19 AUG 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+          <div class="date">1 SEP 2016</div>
+          <h2>Title</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content timeline-card js--fadeInRight">
+          <div class="timeline-img-header">
+            <h2>Card Title</h2>
+          </div>
+          <div class="date">19 AUG 2016</div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+
+        <div class="timeline-img"></div>
+
+        <div class="timeline-content js--fadeInLeft">
+          <div class="date">1 SEP 2016</div>
+          <h2>Title</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maxime ipsa ratione omnis alias cupiditate saepe atque totam aperiam sed nulla voluptatem recusandae dolor, nostrum excepturi amet in dolores. Alias, ullam.</p>
+          <a class="bnt-more" href="javascript:void(0)">More</a>
+        </div>
+      </div>
+
+
+
+    </div>
+  </section>
+  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+<script src='https://cdn.jsdelivr.net/scrollreveal.js/3.3.1/scrollreveal.min.js'></script>
+
+    <script src="js/index.js"></script>
+
+</body>
+</html>
