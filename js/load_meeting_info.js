@@ -204,6 +204,13 @@ class SignupSheet extends SheetV4{
       return monthNames[(m-1)%12] + "'" + y2 +  "-" + monthNames[m] + "'" + y;
     }
   }
+  getDateOfColumn(column_data) {
+    let cell = column_data['Date'];
+    let res = (typeof cell === 'string' || cell instanceof String)?  new Date(cell.trim()) : (new Date(eval(cell)).getDateWithoutTime().addDays(-1));
+    console.warn(res)
+    console.warn(cell)
+    return res
+  }
   getMeetingCol(date_now) {
     var date_row = this.table.rows[0].c;
     // let date_now = date.getDateWithoutTime().addDays(1); // so weird
@@ -269,16 +276,31 @@ class SignupSheet extends SheetV4{
     // col 0 is the title column
     let points = 0;
     for (let col=1; col<=this.meetingCol; col++) {
-      let roles = this.getColumn(col);
+      let column_data = this.getColumn(col);
+
       let li_items = '';
+      // the first week    31, 1, 2, 3, 4, 5, 6, 7, 8
+      // column_data['Date']
+     if (this.getDateOfColumn(column_data).getDate() <= 7) {
+     // console.warn(column_data['Date'])
+     // if (column_data['Date'].getDate() <= 7) {
+      if (points >0) {
+        li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+        <span class="badge badge-primary badge-pill">-${points}</span>
+          Monthly Reset
+        </li>`;
+        points = 0;
+      }
+     }
       // SCORES
-      for (let [key, value] of Object.entries(roles)) {
+      for (let [key, value] of Object.entries(column_data)) {
+        // console.warn(`${key}: ${value}`);
         if (key in SCORES) {
           if(value != null) {
             for(let item of value.split(",")) {
+              console.warn(`${key}: ${item}`);
               if(member == getFirstWord(item.trim()) ){
                 // Ad in Adi
-                console.warn(`${key}: ${item}`);
                 points += SCORES[key];
                 li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
                 <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
@@ -290,18 +312,22 @@ class SignupSheet extends SheetV4{
         }
       }
 
+
       $("#boxtimeline").append(`
       <div class="timeline-item">
         <div class="timeline-img"></div>
         <div class="timeline-content js--fadeInLeft">
-          <h2 align=center>${roles['Theme']}</h2>
-          <div class="date">${roles['Date']}</div>
+          <h2 align=center>${column_data['Theme']}</h2>
+          <div class="date">${column_data['Date']}</div>
           <ul class="list-group">
             ${li_items}
           </ul>
         </div>
       </div>`);
+
+
     }
+
 
     $("#member_score").html(`${points} Points Earned~`)
     return points;
