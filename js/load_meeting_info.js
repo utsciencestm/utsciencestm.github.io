@@ -30,6 +30,25 @@ const getPoints = string => {
     // .toUpperCase();
     // return words[0].toUpperCase();
 };
+function getTop(dict, num=5) {
+  // https://stackoverflow.com/questions/25500316/sort-a-dictionary-by-value-in-javascript
+  // Create items array
+  var items = Object.keys(dict).map(function(key) {
+    return [key, dict[key]];
+  });
+
+  // Sort the array based on the second element
+  items.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+
+  // Create a new array with only the first 5 items
+  // console.log(items.slice(0, 5));
+  return items.slice(0, num);
+}
+// last meeting and this meeting, find out up and down information
+
+
 
 var INFO = {
 "#whatIsDate": "Date",
@@ -276,11 +295,33 @@ class SignupSheet extends SheetV4{
     return false
   }
   // get leader board
-  getMemberTimeline(member) {
-    // till today
-    // col 0 is the title column
-    let points = 0;
+  getToastyPoints(member=null) {
+    var short_names = Object.keys(this.members);
+    var points = {...this.members};
+
+    for(let name in points) {
+      points[name] = 0; // init as zero
+    }
+      // for(var item in SCORES) {
+      //   var point = SCORES[item];
+      //   // Participants
+      //   // signupSheet.whois('Participants').trim().split(',');
+      //   var s = this.whois(item).trim();
+      //   if (s == 'TBA') {
+      //     continue;
+      //   }
+      //   s.split(',').forEach(function (name, index, array){
+      //     name = getFirstWord(name);
+      //     let r = short_names.indexOf(name);
+      //     if (r == -1) {
+      //       return '[' + item + ']:' + name + ' is not a member.(Check spelling?) ';
+      //     }
+      //     points[name] += point;
+      //     console.log(`add ${point} to ${name} for ${item}`)
+      //   });
+      // }
     for (let col=1; col<=this.meetingCol; col++) {
+      let meeting_points = 0; // one member
       let column_data = this.getColumn(col);
 
       let li_items = '';
@@ -289,13 +330,18 @@ class SignupSheet extends SheetV4{
      if (this.getDateOfColumn(column_data).getDate() <= 7) {
      // console.warn(column_data['Date'])
      // if (column_data['Date'].getDate() <= 7) {
-      if (points >0) {
-        li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="badge badge-primary badge-pill">-${points}</span>
-          Monthly Reset
-        </li>`;
-        points = 0;
-      }
+       // reset all members
+       if (member != null) {
+         if (points[member] >0) {
+           li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+           <span class="badge badge-primary badge-pill">-${points[member]}</span>
+             Monthly Reset
+           </li>`;
+         }
+       }
+       for(let name in points) {
+         points[name] = 0; // init as zero
+       }
      }
       // SCORES
       for (let [key, value] of Object.entries(column_data)) {
@@ -303,41 +349,47 @@ class SignupSheet extends SheetV4{
         if (key in SCORES) {
           if(value != null) {
             for(let item of value.split(",")) {
-              console.warn(`${key}: ${item}`);
-              if(member == getFirstWord(item.trim()) ){
-                // Ad in Adi
+              let reward_member = getFirstWord(item.trim());
+              console.warn(`${reward_member}`);
+              // console.warn(`${reward_member}: +${pts}`);
+              if (reward_member in this.members) {
                 let pts = getPoints(item);
                 pts = (pts==undefined)? SCORES[key] : parseInt(pts);
-                points += pts;
-                li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="badge badge-primary badge-pill">+${pts}</span>
-                  ${key.split('(')[0]}
-                </li>`;
+                points[reward_member] += pts;
+                console.warn(`${reward_member}: +${pts}`);
+                if(member == reward_member ){
+                  meeting_points +=  pts;
+                  // Ad in Adi
+                  li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span class="badge badge-primary badge-pill">+${pts}</span>
+                    ${key.split('(')[0]}
+                  </li>`;
+                }
               }
             }
           }
         }
       }
-
-
-      $("#boxtimeline").append(`
-      <div class="timeline-item">
-        <div class="timeline-img"></div>
-        <div class="timeline-content js--fadeInLeft">
-          <h2 align=center>${column_data['Theme']}</h2>
-          <div class="date">${column_data['Date']}</div>
-          <ul class="list-group">
-            ${li_items}
-          </ul>
-        </div>
-      </div>`);
-
-
+      if (member != null) {
+          $("#boxtimeline").append(`
+          <div class="timeline-item" >
+            <div class="timeline-img"></div>
+            <div class="timeline-content js--fadeInLeft" style="background-color:${  (meeting_points > 0)? 'transparent':'gray'}">
+              <h2 align=center>${column_data['Theme']}</h2>
+              <div class="date">${column_data['Date']}</div>
+              <ul class="list-group">
+                ${li_items}
+              </ul>
+            </div>
+          </div>`);
+      }
     }
-
-
-    $("#member_score").html(`${points} Points Earned~`)
-    return points;
+    if (member != null) {
+      $("#member_score").html(`${points[member]} Points Earned~`);
+    }
+    console.log(points)
+    return points
+    // return Object.values(points).join('\n');
   }
   cellIndex(role, strict=true) {
     let entry = this.entry;
@@ -473,6 +525,7 @@ class SignupSheet extends SheetV4{
     //   fillInSuggestion(element);
     // }
   }
+  // outdated
   computeMeetingScores(members) {
     var short_names = Object.keys(members);
     var meeting_points = {...members};

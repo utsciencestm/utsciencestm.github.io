@@ -6,6 +6,92 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
 <link rel="stylesheet" href="css/leaderboard.css">
+<style>
+  a {
+    text-decoration: none;
+    decoration: none;
+    color: white;
+  }
+</style>
+
+<!-- script starts here -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"> -->
+</script>
+<script type="text/javascript"  src="js/shuffle.js" ></script>
+<script type="text/javascript"  src="js/date.js" ></script>
+<script type="text/javascript"  src="js/load_meeting_info.js" ></script>
+<!-- <script type="text/javascript"  src="js/growth.js" ></script> -->
+<script type="text/javascript">
+// var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
+// var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
+// old api is inconvenient because it skips empty cells and don't allow accessing via sheetname (sheet index is needed, so we put the sheet always the second sheets)
+// getData(row, col) {
+// 	let entry = this.entry;
+// 	row = '' + row // to string
+// 	col = '' + col
+// 	for (let i = 0; i < entry.length; i++) {
+// 		if(entry[i].gs$cell.row == row && entry[i].gs$cell.col == col) {
+// 			return  entry[i].content.$t;
+// 		}
+// 	}
+// }
+var signupSheet;
+var toastiesSheet;
+var toastiesPoints;
+var today = new Date();
+today = today.getDateWithoutTime()
+console.warn(`today: ${today}`)
+
+$(document).ready(function() {
+  var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
+  var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
+  toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
+
+  var sheetname = SignupSheet.getMeetingSheetName(today);
+  console.log(`sheetname: ${sheetname}`)
+  signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
+  // wait for all sheets are loaded
+  // first prepare listener
+  console.log("document is ready")
+  var members_loaded = new Promise(function(resolve) {
+      document.addEventListener("loaded_ToastiesSheet",resolve,false);
+  })
+  var roles_loaded = new Promise(function(resolve) {
+      document.addEventListener("loaded_SignupSheet", resolve, false);
+  })
+  Promise.all([members_loaded, roles_loaded]).then(function() {
+      // after getting meeting col
+      // In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
+      toastiesSheet.members = toastiesSheet.listMembers();
+      console.log(`today: ${today}`)
+      signupSheet.meetingCol = signupSheet.getMeetingCol(today);
+      console.log(`today: ${today}`)
+      signupSheet.members = toastiesSheet.members;
+      signupSheet.roles = signupSheet.getColumn(signupSheet.meetingCol);
+
+      // first, only compute points for today
+      // scan this person, if in role, get points
+      // console.warn(signupSheet.roles)
+      // console.log(toastiesSheet.members)
+      // console.log(signupSheet.meetingCol)
+      toastiesPoints = signupSheet.getToastyPoints();
+      // console.log(getTop(toastiesPoints));
+      getTop(toastiesPoints).forEach(item => {
+        $("#leaderboard").append(`<li>
+          <a href="/timeline.html?member=${item[0]}">
+          <mark>${signupSheet.members[item[0]]['full_name']}</mark>
+          <small>${item[1]}</small>
+          </a>
+        </li>
+        `);
+
+      })
+  });
+});
+</script>
+
+<!-- script ends here -->
 
 </head>
 <body>
@@ -17,8 +103,8 @@
     </svg>
     High Scores
   </h1>
-  <ol>
-    <li>
+  <ol id='leaderboard'>
+    <!-- <li>
       <mark>Sowjanya (codepen.io/sowg)</mark>
       <small>21</small>
     </li>
@@ -37,7 +123,7 @@
     <li>
       <mark>-</mark>
       <small>-</small>
-    </li>
+    </li> -->
   </ol>
 </div>
 
