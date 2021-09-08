@@ -182,10 +182,11 @@ blockquote {
   background: #FF4081;
   display: inline-block;
   color: #FFFFFF;
-  padding: 10px;
+  padding: 5px;
   position: absolute;
   top: 0;
   right: 0;
+  font-size: small;
 }
 
 @media screen and (max-width: 768px) {

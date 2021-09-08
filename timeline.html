@@ -17,6 +17,10 @@
       border: 0px solid #ddd;
       border-radius: 0;
       }
+      /* two scroll bar problem */
+      html {
+        overflow-x: initial !important;
+      }
       </style>
       <!-- script starts here -->
       <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
@@ -42,7 +46,7 @@
     // }
     var signupSheet;
     var toastiesSheet;
-    var member = "Shaheer"; // 'Zoe'; // getUrlVars()["member"]
+    var member = getUrlVars()["member"]; //'Zoe'; //"Shaheer"; // 'Zoe'; // getUrlVars()["member"]
     var today = new Date();
     today = today.getDateWithoutTime()
     console.warn(`today: ${today}`)
@@ -64,11 +68,11 @@
     	  var roles_loaded = new Promise(function(resolve) {
     	      document.addEventListener("loaded_SignupSheet", resolve, false);
     	  })
-
     	  Promise.all([members_loaded, roles_loaded]).then(function() {
     	      // after getting meeting col
     				// In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
     				toastiesSheet.members = toastiesSheet.listMembers();
+            $("#membername").html(toastiesSheet.members[member]['full_name']);
     				console.log(`today: ${today}`)
     				signupSheet.meetingCol = signupSheet.getMeetingCol(today);
     				console.log(`today: ${today}`)
@@ -80,9 +84,7 @@
     				// console.warn(signupSheet.roles)
     				// console.log(toastiesSheet.members)
     				// console.log(signupSheet.meetingCol)
-
-
-            $("#boxtimeline").append(signupSheet.getMemberTimeline(member, signupSheet.roles));
+            signupSheet.getMemberTimeline(member);
 
     	  });
     	});
@@ -95,8 +97,9 @@
 <body>
   <header>
     <div class="container text-center">
-      <h1>Vertical Timeline</h1>
-      <p>Sava Lazic</p>
+      <h1>Toasty Timeline</h1>
+      <p id="membername"></p>
+      <h6 id="member_score"></h6>
     </div>
   </header>
 

@@ -65,7 +65,7 @@ var SCORES = {
 "Evaluator # 1 (2-3 mins)": 1+1,
 "Evaluator # 2 (2-3 mins)": 1+1,
 "Evaluator # 3 (2-3 mins)": 1+1,
-"TableTopics Evaluator (2-3 mins)": 2+1,
+"TableTopics Evaluator (3-4 mins)": 2+1,
 "General Evaluator": 1+1,
 "Topics Master": 1+1,
 "Toastmaster": 1+1,
@@ -74,6 +74,8 @@ var SCORES = {
 "Best Evaluator": 2,
 "Traveling Award": 2,
 "Member Sign-up": 4,
+"Time Keeper": 1,
+"Vote Counter": 1,
 "Grammarian     (2 mins)": 1,
 "Ah Counter.     (2 mins)": 1,
 };
@@ -259,28 +261,42 @@ class SignupSheet extends SheetV4{
     location.replace(url)
     return false
   }
-  getMemberTimeline(member, roles) {
-    let li_items = '';
-    for (let [key, value] of Object.entries(signupSheet.roles)) {
-      if(value == member) {
-        console.warn(`${key}: ${value}`);
-        li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
-        <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
-          ${key}
-        </li>`;
+  // get leader board
+  getMemberTimeline(member) {
+    // till today
+    // col 0 is the title column
+    let points = 0;
+    for (let col=1; col<=this.meetingCol; col++) {
+      let roles = this.getColumn(col);
+      let li_items = '';
+      for (let [key, value] of Object.entries(roles)) {
+        if(value == member) {
+          console.warn(`${key}: ${value}`);
+          if (key in SCORES) {
+            points += SCORES[key];
+            li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
+              ${key.split('(')[0]}
+            </li>`;
+          }
+        }
       }
+
+      $("#boxtimeline").append(`
+      <div class="timeline-item">
+        <div class="timeline-img"></div>
+        <div class="timeline-content js--fadeInLeft">
+          <h2 align=center>${roles['Theme']}</h2>
+          <div class="date">${roles['Date']}</div>
+          <ul class="list-group">
+            ${li_items}
+          </ul>
+        </div>
+      </div>`);
     }
-    return `
-    <div class="timeline-item">
-      <div class="timeline-img"></div>
-      <div class="timeline-content js--fadeInLeft">
-        <h2 align=center>${roles['Theme']}</h2>
-        <div class="date">${roles['Date']}</div>
-        <ul class="list-group">
-          ${li_items}
-        </ul>
-      </div>
-    </div>`
+
+    $("#member_score").html(`${points} Points Earned~`)
+    return points;
   }
   cellIndex(role, strict=true) {
     let entry = this.entry;
@@ -312,7 +328,6 @@ class SignupSheet extends SheetV4{
     }
     //get full name if possible
     // dangerous: result = this.members[result]['full_name']
-    if(result in this.members) {return this.members[result]['full_name']}
     return (result == null)? 'TBA' : result;
   }
   get unavailableMembers() {
@@ -344,9 +359,16 @@ class SignupSheet extends SheetV4{
   fillInRole(role, element) {
       let who = this.whois(role);
       console.log(element + ':' + who);
-      $(element).html(who);
-      if (who!='TBA') {
-        this.assignedMembers.push(getFirstWord(who))
+      // $(element).html(who);
+      if (who in this.members) {
+        let fullname = (who in this.members)? this.members[who]['full_name'] : who;
+        $(element).html(`
+          <a href="/timeline.html?member=${who}">
+            ${fullname}
+          </a>`);
+        this.assignedMembers.push(getFirstWord(fullname))
+      } else {
+        $(element).html(`TBA`);
       }
   }
   fillInInfo(role, element) {
