@@ -21,7 +21,12 @@ function getUrlVars() {
 }
 const getFirstWord = string => {
     const words = string.trim().split(' ');
-    return words[0];
+    return words[0].split(':')[0];
+    // .toUpperCase();
+    // return words[0].toUpperCase();
+};
+const getPoints = string => {
+    return string.trim().split(':')[1];
     // .toUpperCase();
     // return words[0].toUpperCase();
 };
@@ -301,9 +306,11 @@ class SignupSheet extends SheetV4{
               console.warn(`${key}: ${item}`);
               if(member == getFirstWord(item.trim()) ){
                 // Ad in Adi
-                points += SCORES[key];
+                let pts = getPoints(item);
+                pts = (pts==undefined)? SCORES[key] : parseInt(pts);
+                points += pts;
                 li_items += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="badge badge-primary badge-pill">+${SCORES[key]}</span>
+                <span class="badge badge-primary badge-pill">+${pts}</span>
                   ${key.split('(')[0]}
                 </li>`;
               }
