@@ -78,6 +78,7 @@ var ROLES = {
 "#whoIsEvaluator2": "Evaluator # 2 (2-3 mins)",
 "#whoIsEvaluator3": "Evaluator # 3 (2-3 mins)",
 "#whoIsTopicsMaster": "Topics Master",
+"#whoIsTechMaster": "Tech-Master",
 };
 var SCORES = {
 "Participants": 1, // don't include those who has roles

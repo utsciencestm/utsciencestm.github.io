@@ -6,8 +6,14 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Eventre</title>
-  
+
+  <meta http-equiv="cache-control" content="max-age=0" />
+  <meta http-equiv="cache-control" content="no-cache" />
+  <meta http-equiv="expires" content="0" />
+  <meta http-equiv="expires" content="Tue, 01 Jan 1990 12:00:00 GMT" />
+
+  <title>UT Sciences Toastmasters</title>
+
   <!-- PLUGINS CSS STYLE -->
   <!-- Bootstrap -->
   <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -24,6 +30,96 @@
   <!-- FAVICON -->
   <link href="images/favicon.png" rel="shortcut icon">
 
+  <!-- script starts here -->
+  <style>
+  .schedule-item {
+    vertical-align: center;
+  }
+  </style>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"> -->
+  </script>
+  <script type="text/javascript"  src="core/shuffle.js" ></script>
+  <script type="text/javascript"  src="core/date.js" ></script>
+  <script type="text/javascript"  src="core/load_meeting_info.js" ></script>
+  <!-- <script type="text/javascript"  src="js/growth.js" ></script> -->
+  <script type="text/javascript">
+  // var URL_SIGNUPSHEET = "https://spreadsheets.google.com/feeds/cells/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/2/public/full?alt=json";
+  // var URL_TOASTIESSHEET = "https://spreadsheets.google.com/feeds/cells/1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4/1/public/full?alt=json";
+  // old api is inconvenient because it skips empty cells and don't allow accessing via sheetname (sheet index is needed, so we put the sheet always the second sheets)
+  // getData(row, col) {
+  // 	let entry = this.entry;
+  // 	row = '' + row // to string
+  // 	col = '' + col
+  // 	for (let i = 0; i < entry.length; i++) {
+  // 		if(entry[i].gs$cell.row == row && entry[i].gs$cell.col == col) {
+  // 			return  entry[i].content.$t;
+  // 		}
+  // 	}
+  // }
+  var signupSheet;
+  var toastiesSheet;
+  var toastiesPoints;
+  var date = getUrlVars()["date"]
+  var now = (date == undefined)? new Date() : new Date(date);
+  var today = now.getDateWithoutTime()
+  console.warn(`today: ${today}`)
+
+  $(document).ready(function() {
+    var SIGNUPSHEET_ID = '17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU';
+    var TOASTIESSHEET_ID = '1E9VdBM1YSS0ykQG-U8yAopu8a2c9_G9U66DG_pmBmw4';
+    toastiesSheet = new ToastiesSheet(TOASTIESSHEET_ID, "2021");
+
+    var sheetname = SignupSheet.getMeetingSheetName(today);
+    console.log(`sheetname: ${sheetname}`)
+    signupSheet = new SignupSheet(SIGNUPSHEET_ID, encodeURIComponent(sheetname)); // "Aug+%2721-Sept+%2721"
+    // wait for all sheets are loaded
+    // first prepare listener
+    console.log("document is ready")
+    var members_loaded = new Promise(function(resolve) {
+        document.addEventListener("loaded_ToastiesSheet",resolve,false);
+    })
+    var roles_loaded = new Promise(function(resolve) {
+        document.addEventListener("loaded_SignupSheet", resolve, false);
+    })
+    Promise.all([members_loaded, roles_loaded]).then(function() {
+        // after getting meeting col
+        // In the javascript world months begin with zero! kind of weird to me. Anyhow, 9 is NOT September, but rather 9 is October.
+        toastiesSheet.members = toastiesSheet.listMembers();
+        console.log(`today: ${today}`)
+        signupSheet.meetingCol = signupSheet.getMeetingCol(today);
+        console.log(`today: ${today}`)
+        signupSheet.members = toastiesSheet.members;
+        signupSheet.roles = signupSheet.getColumn(signupSheet.meetingCol);
+
+        // first, only compute points for today
+        // scan this person, if in role, get points
+        // console.warn(signupSheet.roles)
+        // console.log(toastiesSheet.members)
+        // console.log(signupSheet.meetingCol)
+        toastiesPoints = signupSheet.getToastyPoints();
+        $("#theme").html(signupSheet.roles['Theme']);
+        $("#desc").html(signupSheet.roles['Description']);
+        $("#when_where").html(signupSheet.roles['Date'] + ' ' + signupSheet.roles['Room']);
+        signupSheet.fillInForm();
+
+        // -----------------------------
+        //  Count Down JS
+        // -----------------------------
+        $('.timer').syotimer({
+            year: now.getFullYear(),
+            month: now.getMonth()+1,
+            day: now.getDate()+1,
+            hour: 18,
+            minute: 00
+        });
+    });
+  });
+  </script>
+
+  <!-- script ends here -->
+
 </head>
 
 <body class="body-wrapper">
@@ -37,7 +133,8 @@
   <div class="container-fluid p-0">
       <!-- logo -->
       <a class="navbar-brand" href="index.html">
-        <img src="images/logo.png" alt="logo">
+        <img src="images/logo.png" width= alt="logo">
+        <span style="font-size:small">/ UT Sciences</span>
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="fa fa-bars"></span>
@@ -45,23 +142,42 @@
       <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mx-auto">
         <li class="nav-item dropdown active dropdown-slide">
-          <a class="nav-link" href="#"  data-toggle="dropdown">Home
+          <a class="nav-link" href="#"  data-toggle="dropdown">Website
             <span>/</span>
           </a>
-          <!-- Dropdown list -->
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="index.html">Homepage</a>
-            <a class="dropdown-item" href="homepage-two.html">Homepage 2</a>
+            <a class="dropdown-item" href="http://utsciencestm.blogspot.com/">2019</a>
+            <a class="dropdown-item" href="https://utsciencestm.wixsite.com/website">2020~Now</a>
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="speakers.html">Speakers
+          <a class="nav-link" href="#agenda">Agenda
             <span>/</span>
           </a>
         </li>
-        <li class="nav-item dropdown dropdown-slide">
+        <li class="nav-item">
+          <a class="nav-link" href="#officer">Officers
+            <span>/</span>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#faq">FAQ
+            <span>/</span>
+          </a>
+        </li>
+
+        <li class="nav-item dropdown  dropdown-slide">
+          <a class="nav-link" href="#"  data-toggle="dropdown">Contact
+            <!-- <span>/</span> -->
+          </a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="https://www.facebook.com/groups/UTSTM">Facebook</a>
+            <a class="dropdown-item" href="https://www.instagram.com/utsciencestoastmasters/?hl=en">Instagram</a>
+          </div>
+        </li>
+        <!-- <li class="nav-item dropdown dropdown-slide">
           <a class="nav-link" href="#" data-toggle="dropdown">Pages<span>/</span></a>
-            <!-- Dropdown list -->
             <div class="dropdown-menu">
               <a class="dropdown-item" href="about-us.html">About Us</a>
               <a class="dropdown-item" href="single-speaker.html">Single Speaker</a>
@@ -72,8 +188,8 @@
               <a class="dropdown-item" href="FAQ.html">FAQ</a>
               <a class="dropdown-item" href="404.html">404</a>
             </div>
-        </li>
-        <li class="nav-item">
+        </li> -->
+        <!-- <li class="nav-item">
           <a class="nav-link" href="schedule.html">Schedule<span>/</span></a>
         </li>
         <li class="nav-item">
@@ -83,7 +199,6 @@
           <a class="nav-link" href="#"  data-toggle="dropdown">News
             <span>/</span>
           </a>
-          <!-- Dropdown list -->
           <div class="dropdown-menu">
             <a class="dropdown-item" href="news.html">News without sidebar</a>
             <a class="dropdown-item" href="news-right-sidebar.html">News with right sidebar</a>
@@ -94,11 +209,13 @@
         <li class="nav-item">
           <a class="nav-link" href="contact.html">Contact</a>
         </li>
-      </ul>
-      <a href="#" class="ticket">
-        <img src="images/icon/ticket.png" alt="ticket">
-        <span>Buy Ticket</span>
+      </ul> -->
+      <a href="#subscribe" class="ticket" style="color: white; height:40%">
+        <!-- <img src="images/icon/ticket.png" alt="ticket"> -->
+        <i class="fa fa-user-plus fa-lg"></i>
+        <span>Connect</span>
       </a>
+      &nbsp; &nbsp;
       </div>
   </div>
 </nav>
@@ -119,20 +236,23 @@
 				<div class="block">
 					<!-- Coundown Timer -->
 					<div class="timer"></div>
-					<h1>Business</h1>
-					<h2>Conference 2017</h2>
-					<h6>02-05 July 2017 California</h6>
+          <!-- <i style="color:white">Upcoming</i> -->
+					<h1 id="theme"></h1>
+					<h2 id="desc" style="text-transform: none"></h2>
+					<h6 id="when_where">02-05 July 2017 California</h6>
 					<!-- Action Button -->
-					<a href="#" class="btn btn-white-md">get ticket now</a>
+					<!-- <a href="#" class="btn btn-white-md">get ticket now</a> -->
+					<a href="https://utexas.zoom.us/j/91041356319" class="btn btn-white-md">JOIN ZOOM</a>
+					<a href="https://docs.google.com/spreadsheets/d/17Vtxbeh7Q6-ic89sWC8_U8RUoUAr6dlvi3jxADRMNQU/" class="btn btn-white-md">Signup roles</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
-	
+
 <!--====  End of Banner  ====-->
 
-<section style="padding: 100px 0;">
+<!-- <section style="padding: 100px 0;">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8 mx-auto">
@@ -149,18 +269,18 @@
 						<li>Personal and commercial Use</li>
 						<li>One time payment</li>
 					</ul>
-					<a href="https://themefisher.com/products/eventre-event-conference-website-template/" target="_blank" class="btn btn-main">Buy Premium Version</a>			
+					<a href="https://themefisher.com/products/eventre-event-conference-website-template/" target="_blank" class="btn btn-main">Buy Premium Version</a>
 				</div>
 			</div>
 		</div>
 	</div>
-</section>
+</section> -->
 
 <!--===========================
 =            About            =
 ============================-->
 
-<section class="section about">
+<!-- <section class="section about">
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-4 col-md-6 align-self-center">
@@ -191,391 +311,267 @@
 			</div>
 		</div>
 	</div>
-</section>
+</section> -->
 
 <!--====  End of About  ====-->
 
-<!--==============================
-=            Speakers            =
-===============================-->
 
-<section class="section speakers bg-speaker overlay-lighter">
-	<div class="container">
-		<div class="row">
-			<div class="col-12">
-				<!-- Section Title -->
-				<div class="section-title white">
-					<h3>Who <span class="alternate">Speaking?</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 1 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-one.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 2 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-two.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 3 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-three.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 4 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-four.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 5 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-five.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 1 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-six.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 7 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-five.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-			<div class="col-lg-3 col-md-4 col-sm-6">
-				<!-- Speaker 8 -->
-				<div class="speaker-item">
-					<div class="image">
-						<img src="images/speakers/speaker-six.jpg" alt="speaker" class="img-fluid">
-						<div class="primary-overlay"></div>
-						<div class="socials">
-							<ul class="list-inline">
-								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="content text-center">
-						<h5><a href="single-speaker.html">Johnathan Franco</a></h5>
-						<p>Project Manager</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!--====  End of Speakers  ====-->
 
 <!--==============================
 =            Schedule            =
 ===============================-->
 
-<section class="section schedule">
+<section id="agenda" class="section schedule">
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
 				<div class="section-title">
-					<h3>Event <span class="alternate">Schedule</span></h3>
-					<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+					<h3>Check out <span class="alternate">Agenda</span></h3>
+					<!-- <p>
+            The success of a club meeting depends on the participants. At each meeting, there are many roles to fill and they play an important part in making the club experience enjoyable.
+            Below is a list of our supporting roles.
+          </p> -->
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<div class="schedule-tab">
+
+
+				<!-- <div class="schedule-tab">
 					<ul class="nav nav-pills text-center">
 					  <li class="nav-item">
 					    <a class="nav-link active" href="#nov20" data-toggle="pill">
-					    	Day-01
-					    	<span>20 November 2017</span>
+					    	Main
+					    	<span>Prepared Speeches</span>
 					    </a>
 					  </li>
 					  <li class="nav-item">
 					    <a class="nav-link" href="#nov21" data-toggle="pill">
-							Day-02
-					    	<span>21 November 2017</span>
+							TableTopics
+					    	<span>Impromptu Speeches</span>
 					    </a>
 					  </li>
 					  <li class="nav-item">
 					    <a class="nav-link" href="#nov22" data-toggle="pill">
-							Day-03
-					    	<span>22 November 2017</span>
+							Evaluation
+					    	<span>Feedback</span>
 					    </a>
 					  </li>
 					</ul>
-				</div>
-				<div class="schedule-contents bg-schedule">
+				</div> -->
+
+        <div class="schedule-contents bg-schedule">
 					<div class="tab-content" id="pills-tabContent">
 					  <div class="tab-pane fade show active schedule-item" id="nov20">
-					  	<!-- Headings -->
+              <ul class="m-0 p-0">
+					  		<li class="headings">
+					  			<div class="time">Introduction</div>
+					  			<!-- <div class="speaker">Speaker</div>
+					  			<div class="subject">Project</div>
+					  			<div class="venue">Subject</div> -->
+					  		</li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsPresidingOfficer">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Presiding Officer</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsGrammarian">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Grammarian</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsAhCounter">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Ah Counter</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsTimeKeeper">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Time Keeper</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsVoteCounter">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Vote Counter</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+
+                <li class="schedule-details">
+                  <div class="block">
+                    <!-- time -->
+                    <div class="time" >
+                      <!-- <i class="fa fa-clock-o"></i>
+                      <span class="time">9.00 AM</span> -->
+                      <div id="whoIsTechMaster">TBA</div>
+                    </div>
+                    <!-- Speaker -->
+                    <div class="speaker">
+                      <!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name">Tech-Master</span>
+                    </div>
+                    <!-- Subject -->
+                    <div class="subject" ></div>
+                    <!-- Venue -->
+                    <div class="venue"></div>
+                  </div>
+                </li>
+              </ul>
+
+
+              <!-- Headings -->
 					  	<ul class="m-0 p-0">
 					  		<li class="headings">
-					  			<div class="time">Time</div>
-					  			<div class="speaker">Speaker</div>
-					  			<div class="subject">Subject</div>
-					  			<div class="venue">Venue</div>
+					  			<div class="time">Prepared Speeches</div>
+					  			<!-- <div class="speaker">Speaker</div>
+					  			<div class="subject">Project</div>
+					  			<div class="venue">Subject</div> -->
 					  		</li>
 					  		<!-- Schedule Details -->
 					  		<li class="schedule-details">
 					  			<div class="block">
 					  				<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">9.00 AM</span>
+							  		<div class="time" >
+							  			<!-- <i class="fa fa-clock-o"></i>
+							  			<span class="time">9.00 AM</span> -->
+                      <div id="whoIsSpeaker1">TBA</div>
 							  		</div>
 							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one">
-										<span class="name">Samanta Doe</span>
+							  			<!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+                      <span class="name"  id="whatSpeech1"></span>
 							  		</div>
 							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
+							  		<div class="subject" ></div>
 							  		<!-- Venue -->
-							  		<div class="venue">Auditorium A</div>
+							  		<div class="venue"></div>
 					  			</div>
 					  		</li>
-					  		<!-- Schedule Details -->
+                <!-- Schedule Details -->
 					  		<li class="schedule-details">
 					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">10.00 AM</span>
+							  		<div class="time" >
+                      <div id="whoIsSpeaker2"></div>
 							  		</div>
-							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-two.jpg" alt="speaker-thumb-two">
-										<span class="name">Zerad Pawel</span>
+										<span class="name" id="whatSpeech2">TBA</span>
 							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Principle of Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium B</div>
 					  			</div>
 					  		</li>
-					  		<!-- Schedule Details -->
+                <!-- Schedule Details -->
 					  		<li class="schedule-details">
 					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">12.00 AM</span>
+							  		<div class="time" >
+                      <div id="whoIsSpeaker3"></div>
 							  		</div>
-							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-three.jpg" alt="speaker-thumb-three">
-										<span class="name">Henry Mong</span>
+										<span class="name" id="whatSpeech3">TBA</span>
 							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Wp Requirements</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium C</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">2.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-four.jpg" alt="speaker-thumb-four">
-										<span class="name">Baily Leo</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium D</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-five.jpg" alt="speaker-thumb-five">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-six.jpg" alt="speaker-thumb-six">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
 					  			</div>
 					  		</li>
 					  	</ul>
-					  </div>
-					  <div class="tab-pane fade schedule-item" id="nov21">
-					  	<!-- Headings -->
-					  	<ul class="m-0 p-0">
+
+
+
+              <ul class="m-0 p-0">
 					  		<li class="headings">
-					  			<div class="time">Time</div>
-					  			<div class="speaker">Speaker</div>
-					  			<div class="subject">Subject</div>
-					  			<div class="venue">Venue</div>
+					  			<div class="time">TableTopics</div>
+					  			<!-- <div class="speaker">Speaker</div>
+					  			<div class="subject">Project</div>
+					  			<div class="venue">Subject</div> -->
 					  		</li>
 					  		<!-- Schedule Details -->
 					  		<li class="schedule-details">
 					  			<div class="block">
 					  				<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">9.00 AM</span>
+							  		<div class="time" id="whoIsTopicsMaster">
+							  			<!-- <i class="fa fa-clock-o"></i>
+							  			<span class="time">9.00 AM</span> -->
 							  		</div>
 							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one">
-										<span class="name">Samanta Doe</span>
+							  			<!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+										<span class="name" >TopicsMaster</span>
 							  		</div>
 							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
+							  		<div class="subject"></div>
 							  		<!-- Venue -->
-							  		<div class="venue">Auditorium A</div>
+							  		<div class="venue" ></div>
 					  			</div>
 					  		</li>
 					  		<!-- Schedule Details -->
@@ -583,226 +579,147 @@
 					  			<div class="block">
 						  			<!-- time -->
 							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">10.00 AM</span>
+
+
 							  		</div>
 							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-two.jpg" alt="speaker-thumb-two">
-										<span class="name">Zerad Pawel</span>
+							  			<!-- <img src="images/speakers/speaker-thumb-two.jpg" alt="speaker-thumb-two"> -->
+										<span class="name">Table Topics</span>
 							  		</div>
 							  		<!-- Subject -->
-							  		<div class="subject">Principle of Wp</div>
+							  		<div class="subject"></div>
 							  		<!-- Venue -->
-							  		<div class="venue">Auditorium B</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">12.00 AM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-three.jpg" alt="speaker-thumb-three">
-										<span class="name">Henry Mong</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Wp Requirements</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium C</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">2.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-four.jpg" alt="speaker-thumb-four">
-										<span class="name">Baily Leo</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium D</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-five.jpg" alt="speaker-thumb-five">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-six.jpg" alt="speaker-thumb-six">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
+							  		<div class="venue">
+                      <i class="fa fa-clock-o"></i>
+							  			<span class="time">1-2 min each</span>
+                    </div>
 					  			</div>
 					  		</li>
 					  	</ul>
-					  </div>
-					  <div class="tab-pane fade schedule-item" id="nov22">
-					  	<!-- Headings -->
-					  	<ul class="m-0 p-0">
+
+              <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+
+              <ul class="m-0 p-0">
 					  		<li class="headings">
-					  			<div class="time">Time</div>
-					  			<div class="speaker">Speaker</div>
-					  			<div class="subject">Subject</div>
-					  			<div class="venue">Venue</div>
+					  			<div class="time">Evluation</div>
+					  			<!-- <div class="speaker">Speaker</div>
+					  			<div class="subject">Project</div>
+					  			<div class="venue">Subject</div> -->
+					  		</li>
+                <!-- Schedule Details -->
+					  		<li class="schedule-details">
+					  			<div class="block">
+					  				<!-- time -->
+							  		<div class="time" id="whoIsGeneralEvaluator">
+
+							  			<!-- <i class="fa fa-clock-o"></i>
+							  			<span class="time">2-3 min</span> -->
+							  		</div>
+							  		<!-- Speaker -->
+							  		<div class="speaker" >
+							  			<!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+										<span class="name"  > General Evaluator</span>
+							  		</div>
+							  		<!-- Subject -->
+							  		<div class="subject"></div>
+							  		<!-- Venue -->
+							  		<div class="venue" ></div>
+					  			</div>
 					  		</li>
 					  		<!-- Schedule Details -->
 					  		<li class="schedule-details">
 					  			<div class="block">
 					  				<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">9.00 AM</span>
+							  		<div class="time" id="whoIsEvaluator1">
+
 							  		</div>
 							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one">
-										<span class="name">Samanta Doe</span>
+							  			<!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="speaker-thumb-one"> -->
+										<span class="name">Evaluation of the 1st Speech</span>
 							  		</div>
 							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
+							  		<div class="subject"></div>
 							  		<!-- Venue -->
-							  		<div class="venue">Auditorium A</div>
+							  		<div class="venue"  >
+							  			<i class="fa fa-clock-o"></i>
+							  			<!-- <span class="time"></span> -->
+                      2-3 min
+                    </div>
 					  			</div>
 					  		</li>
 					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
+                <li class="schedule-details">
 					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">10.00 AM</span>
+							  		<div class="time" id="whoIsEvaluator2">
 							  		</div>
-							  		<!-- Speaker -->
 							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-two.jpg" alt="speaker-thumb-two">
-										<span class="name">Zerad Pawel</span>
+										<span class="name">Evaluation of the 2nd Speech</span>
 							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Principle of Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium B</div>
+							  		<div class="subject"></div>
+							  		<div class="venue"  >
+							  			<i class="fa fa-clock-o"></i>
+                      2-3 min
+                    </div>
 					  			</div>
 					  		</li>
 					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">12.00 AM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-three.jpg" alt="speaker-thumb-three">
-										<span class="name">Henry Mong</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Wp Requirements</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium C</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">2.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-four.jpg" alt="speaker-thumb-four">
-										<span class="name">Baily Leo</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Introduction to Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium D</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-five.jpg" alt="speaker-thumb-five">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
-					  			</div>
-					  		</li>
-					  		<!-- Schedule Details -->
-					  		<li class="schedule-details">
-					  			<div class="block">
-						  			<!-- time -->
-							  		<div class="time">
-							  			<i class="fa fa-clock-o"></i>
-							  			<span class="time">3.00 PM</span>
-							  		</div>
-							  		<!-- Speaker -->
-							  		<div class="speaker">
-							  			<img src="images/speakers/speaker-thumb-six.jpg" alt="speaker-thumb-six">
-										<span class="name">Lee Mun</span>
-							  		</div>
-							  		<!-- Subject -->
-							  		<div class="subject">Useful tips for Wp</div>
-							  		<!-- Venue -->
-							  		<div class="venue">Auditorium E</div>
-					  			</div>
-					  		</li>
+                <li class="schedule-details">
+                  <div class="block">
+                    <div class="time" id="whoIsEvaluator3">
+                    </div>
+                    <div class="speaker">
+                    <span class="name">Evaluation of the 3rd Speech</span>
+                    </div>
+                    <div class="subject"></div>
+                    <div class="venue"  >
+                      <i class="fa fa-clock-o"></i>
+                      2-3 min
+                    </div>
+                  </div>
+                </li>
+
+                <!-- Schedule Details -->
+                <li class="schedule-details">
+                  <div class="block">
+                    <div class="time" id="whoIsTableTopicsEvaluator">
+                    </div>
+                    <div class="speaker">
+                    <span class="name">Table Topics Evaluation</span>
+                    </div>
+                    <div class="subject"></div>
+                    <div class="venue"  >
+                      <i class="fa fa-clock-o"></i>
+                      2-3 min
+                    </div>
+                  </div>
+                </li>
+
+
 					  	</ul>
+
+
+
+              <ul class="m-0 p-0">
+					  		<li class="headings">
+					  			<div class="time">Awards</div>
+					  			<!-- <div class="speaker">Speaker</div>
+					  			<div class="subject">Project</div>
+					  			<div class="venue">Subject</div> -->
+					  		</li>
+              </ul>
+
 					  </div>
 					</div>
-				</div>
-				
+
+
+
+          <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+
+
+
+
 			</div>
 		</div>
 	</div>
@@ -810,9 +727,483 @@
 
 <!--====  End of Schedule  ====-->
 
+<!--==============================
+=            Speakers            =
+===============================-->
+
+<section id="officer" class="section speakers bg-speaker overlay-lighter">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<!-- Section Title -->
+				<div class="section-title white">
+					<h3>Meet <span class="alternate">Club Officers</span></h3>
+					<p>Serving as an Officer in a Toastmasters Club is an opportunity and a responsibility. It is a great opportunity to get training and experience in a leadership role. It is part of our club membership to be responsible to promote the club's service to members.</p>
+					<!-- <p>The success of a club meeting depends on the participants. At each meeting, there are many roles to fill and they play an important part in making the club experience enjoyable.
+          Below is a list of our supporting roles.</p> -->
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 1 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Adi.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+								<li class="list-inline-item"><a href="mailto:adiojha629@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+								<!-- <li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Aditya Ojha</a></h5>
+						<p>President</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 2 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Zoe.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:zz6375@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+								<!-- <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Zoe Zhang</a></h5>
+						<p>Vice President of Education</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 3 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Shaheer.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:shaheer.khan.skhan@gmail.com"><i class="fa fa-envelope"></i></a></li>
+								<!-- <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5 id="whoIsTimeKeeper"><a href="single-speaker.html">Shaheer Khan</a></h5>
+						<p>Vice President of Membership</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 4 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Ananya.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:ananya.venkat@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+                <!--
+								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Ananya Venkateswaran</a></h5>
+						<p>Vice President of Public Relations</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 5 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Kayla.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:kaylawong@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+                <!--
+								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Kayla Wong</a></h5>
+						<p>Treasurer</p>
+					</div>
+				</div>
+			</div>
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 5 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Marcos.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:floresmarcos14@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+								<!-- <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Marcos Flores</a></h5>
+						<p>Secretary</p>
+					</div>
+				</div>
+			</div>
+
+
+      <div class="col-lg-3 col-md-4 col-sm-6">
+				<!-- Speaker 5 -->
+				<div class="speaker-item">
+					<div class="image" align=center>
+						<img src="images/Zhenqiang.webp" alt="speaker" class="img-fluid">
+						<div class="primary-overlay"></div>
+						<div class="socials">
+							<ul class="list-inline">
+                <li class="list-inline-item"><a href="mailto:zqying@utexas.edu"><i class="fa fa-envelope"></i></a></li>
+                <!--
+								<li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-linkedin"></i></a></li>
+								<li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li> -->
+							</ul>
+						</div>
+					</div>
+					<div class="content text-center">
+						<h5><a href="single-speaker.html">Zhenqiang Ying</a></h5>
+						<p>Sergeant at Arms</p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</section>
+
+<!--====  End of Speakers  ====-->
+
+
+<!--=================================
+=            Testimonial            =
+==================================-->
+
+<section class="section testimonial">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="section-title">
+					<h3>What<span class="alternate">Club Members</span> Say About Us</h3>
+					<!-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti aliquid vero harum rerum voluptates, ab, ullam.</p> -->
+				</div>
+			</div>
+		</div>
+		<div class="row mt-20">
+			<div class="col-lg-4 col-md-6 mb-20">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+					<!-- Given Comment -->
+					<div class="comment">
+						<p>
+This club is a welcoming environment to allow your creativity to shine. UT Sciences TM has helped me overcome speech anxiety, improve my presentation skills, and become an in-depth speech evaluator. This club is a place where open minded individuals get to express themselves.</p>
+					</div>
+					<div class="person">
+						<div class="media">
+							<!-- Person Image -->
+							<!-- <img src="images/speakers/speaker-thumb-three.jpg" alt="person-image"> -->
+							<div class="media-body">
+								<!-- Person Name -->
+								<div class="name"><p>Spencer Gregory</p></div>
+								<!-- Profession -->
+								<div class="profession"><p>Fall 2018 - Present</p></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+      <div class="col-lg-4 col-md-6">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+					<!-- Given Comment -->
+					<div class="comment">
+						<p>As an international graduate student, I find this club a great place to improve my public speaking and leadership skills. It is a safe space and everyone is very supportive. Especially during such an uncertain time, our meetings on Fridays has become the constant of my life, something to count on each week.</p>
+					</div>
+					<div class="person">
+						<div class="media">
+							<!-- Person Image -->
+							<!-- <img src="images/speakers/speaker-thumb-four.jpg" alt="person-image"> -->
+							<div class="media-body">
+								<!-- Person Name -->
+								<div class="name"><p>Zed Yuan</p></div>
+								<!-- Profession -->
+								<div class="profession"><p>Fall 2019 - Present</p></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+      <div class="col-lg-4 col-md-6">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+        </div>
+      </div>
+
+			<div class="col-lg-4 col-md-6">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+					<!-- Given Comment -->
+					<div class="comment">
+						<p>Prior to joining toastmasters, I had thought I had amazing public speaking skills and I was a superstar. Later when competing in a case competition I realized that my skills had decreased and I realized what you feed flourishes and what you neglect dies. In this case my public speaking skills were dying. I immediately joined UTSTM signed up to be a member the first meeting. Ever since then it's became the one place in all the forty acres where I feel like I can be myself and be accepted. I'm so glad I joined the club I've me the best people I could have asked for!</p>
+					</div>
+					<div class="person">
+						<div class="media">
+							<!-- Person Image -->
+							<!-- <img src="images/speakers/speaker-thumb-five.jpg" alt="person-image"> -->
+							<div class="media-body">
+								<!-- Person Name -->
+								<div class="name"><p>Arushi Guddanti</p></div>
+								<!-- Profession -->
+								<div class="profession"><p>Spring 2019 - Present</p></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+      <div class="col-lg-4 col-md-6">
+				<!-- Testimonial -->
+				<div class="testimonial-item">
+					<!-- Given Comment -->
+					<div class="comment">
+						<p>The UTSTM club is a great place to expand your public speaking skills. All members are very respectful and courteous. The club does a great job of celebrating member's strengths in speaking along with mentioning areas of improvement. I was so surprised in the first evaluation I received for table topics; I thought I was a complete mess, but my evaluator saw some good things in my speech. Overall, a great community that helps you build a deserve group of friends and improve your professional speaking skills. Out of all the decisions I made in my first year in UT, joining this club was the best one.</p>
+					</div>
+					<div class="person">
+						<div class="media">
+							<!-- Person Image -->
+							<!-- <img src="images/speakers/speaker-thumb-one.jpg" alt="person-image"> -->
+							<div class="media-body">
+								<!-- Person Name -->
+								<div class="name"><p>Adi Ojha</p></div>
+								<!-- Profession -->
+								<div class="profession"><p>Fall 2019 - Present</p></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</section>
+
+<!--====  End of Testimonial  ====-->
+
+
+
+<!--=========================
+=            FAQ            =
+==========================-->
+
+<section id="faq" class="section faq">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="section-title">
+					<h3>Our <span class="alternate">FAQ</span></h3>
+					<!-- <p>This section is designed to help answer your burning questions. What is UTSTM what should I be doing as a member etc. If your questions are more specific, look at the FAQ page, or Slack message an officer.</p> -->
+					<p>Feel free to reach out any <a href="#officer">club officer</a> for questions.</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="accordion-block">
+					<div id="accordion">
+						<!-- Collapse -->
+						<div class="card">
+							<!-- Collapse Header -->
+							<div class="card-header" id="headingOne">
+							  <h5 class="mb-0">
+							    <a data-toggle="collapse" href="#collapseOne">
+							      <span class="fa fa-plus-circle"></span>What is UTSTM?
+							    </a>
+							  </h5>
+							</div>
+							<!-- Collapse Body -->
+							<div id="collapseOne" class="collapse show" data-parent="#accordion">
+							  <div class="card-body">
+							    We are a community of students at UT Austin dedicated to improving our public speaking and professional skills. We do this at our toastmaster meetings, which occur weekly on Fridays from 5:55-7:15.
+
+                  <br>
+                  <br>
+                  At meetings our members get ample opportunities to practice public speaking.
+							  </div>
+							</div>
+						</div>
+						<!-- Collapse -->
+
+						<!-- Collapse -->
+						<div class="card">
+							<!-- Collapse Header -->
+							<div class="card-header" id="headingOne">
+							  <h5 class="mb-0">
+							    <a data-toggle="collapse" href="#collapseThree">
+							      <span class="fa fa-plus-circle"></span>What is ‘Pathways’, and how do I sign up?
+							    </a>
+							  </h5>
+							</div>
+							<!-- Collapse Body -->
+							<div id="collapseThree" class="collapse" data-parent="#accordion">
+							  <div class="card-body">
+                  Pathways is the educational program Toastmasters International provides for its members. The Pathway you choose will give you a list of speech topics and activities to improve your public speaking and leadership skills.
+                  <br/>
+                  Whenever you see someone doing a prepared speech, they’re completing a project from their pathways.
+                  <br/>
+                  There are 11 pathways you can choose from. Explore them all <a href="https://www.toastmasters.org/Pathways-Overview">here (scroll down a bit)</a>
+                  <br/>
+                  To read more look at <a href="https://docs.google.com/document/d/1o6XsYJnRv0VwaIGl5KMGqzz1z6jQDemxdXjELNUBt54/edit">this document</a>
+							  </div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="accordion-block">
+					<div id="accordionTwo">
+
+            <!-- Collapse -->
+            <div class="card">
+              <!-- Collapse Header -->
+              <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                  <a data-toggle="collapse" href="#collapseFour">
+                    <span class="fa fa-plus-circle"></span>What is the mentorship program?
+                  </a>
+                </h5>
+              </div>
+              <!-- Collapse Body -->
+              <div id="collapseFour" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                  A mentor offers you guidance and support so that you can get the most out of this club. The mentorship program is managed by the VPM, who pairs mentees with their mentors.
+
+                  <br>
+                  <br>
+                  <a class="btn btn-main-md" href="https://utsciencestm.wixsite.com/website/post/membership-why-is-it-important">
+                    learn more
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- Collapse -->
+            <div class="card">
+              <!-- Collapse Header -->
+              <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                  <a data-toggle="collapse" href="#collapseFive">
+                    <span class="fa fa-plus-circle"></span>How to become a member
+                  </a>
+                </h5>
+              </div>
+              <!-- Collapse Body -->
+              <div id="collapseFive" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                  The best way to learn if this club is for you is to join a meeting. Visit this <a href="https://utsciencestm.wixsite.com/website/joining-the-club">link</a> to see how to attend a meeting.
+                  <br/>
+                  There is no introduction meeting for all our new members. You can join our club any time in the school year!
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+							<!-- Collapse Header -->
+							<div class="card-header" id="headingOne">
+							  <h5 class="mb-0">
+							    <a data-toggle="collapse" href="#collapseTwo">
+							      <span class="fa fa-plus-circle"></span>As a member what should I be doing??
+							    </a>
+							  </h5>
+							</div>
+							<!-- Collapse Body -->
+							<div id="collapseTwo" class="collapse" data-parent="#accordion">
+							  <div class="card-body">
+                  The short answer: having fun!
+                  <br>
+                  <br>
+
+                    Long answer: Here are some best practices we recommend for new members:
+                    <ul>
+                      <li>
+                      Attend meetings as often as you can (2-3 times a month at min.)
+                      </li>
+                      <li>
+                      take speaking or supporting roles
+                      </li>
+                      <li>
+                      Get a mentor to help you identify your goals and get the most out of the club
+                      </li>
+                      <li>
+                      Actively listen to evaluators: try to learn from the evaluations of your speeches and others!
+                      </li>
+                      <li>
+                      Have fun! The best way to learn is to have fun along the way.
+                    </li>
+                  </ul>
+							  </div>
+							</div>
+						</div>
+
+
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--====  End of FAQ  ====-->
+
+
 <!--==================================
 =            Registration            =
 ===================================-->
+
 
 <section class="registration">
 	<div class="container-fuild p-0">
@@ -823,29 +1214,29 @@
 						<div class="col-6">
 							<!-- Service item -->
 							<div class="service-item">
-								<i class="fa fa-microphone"></i>
-								<h5>8 Speakers</h5>
+								<i class="fa fa-users"></i>
+								<h5>300,000+ members</h5>
 							</div>
 						</div>
 						<div class="col-6">
 							<!-- Service item -->
 							<div class="service-item">
-								<i class="fa fa-flag"></i>
-								<h5>500 + Seats</h5>
+								<i class="fa fa-globe"></i>
+								<h5>149 countries</h5>
 							</div>
 						</div>
 						<div class="col-6">
 							<!-- Service item -->
 							<div class="service-item">
-								<i class="fa fa-ticket"></i>
-								<h5>300 tickets</h5>
+								<i class="fa fa-glass"></i>
+								<h5>15,800+ clubs</h5>
 							</div>
 						</div>
 						<div class="col-6">
 							<!-- Service item -->
 							<div class="service-item">
-								<i class="fa fa-calendar"></i>
-								<h5>3 days event</h5>
+								<i class="fa fa-birthday-cake"></i>
+								<h5>Since 1924</h5>
 							</div>
 						</div>
 					</div>
@@ -855,11 +1246,21 @@
 				<div class="registration-block bg-registration overlay-dark">
 					<div class="block">
 						<div class="title text-left">
-							<h3>Register to <span class="alternate">Eventre</span></h3>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit</p>
+							<h3>Register to <span class="alternate">Toastmasters</span></h3>
+              <div class="section-title white">
+  							<p>
+  							<i>
+                  Toastmasters International is a nonprofit educational organization that teaches public speaking and leadership skills
+                  through a worldwide network of clubs. Headquartered in Englewood, Colo., the organization's membership
+                  exceeds 300,000 in more than 15,800 clubs in 149 countries. Since 1924,
+                  Toastmasters International has helped people from diverse backgrounds
+                  become more confident speakers, communicators, and leaders.
+                </i>
+                </p>
+						  </div>
 						</div>
 						<form action="#" class="row">
-							<div class="col-md-6">
+							<!-- <div class="col-md-6">
 								<input type="text" class="form-control main" placeholder="Your Name">
 							</div>
 							<div class="col-md-6">
@@ -879,9 +1280,10 @@
 								      <option>5</option>
 								    </select>
 								</div>
-							</div>
+							</div> -->
 							<div class="col-12">
-								<button type="submit" class="btn btn-white-md">Register Now</button>
+                <!-- type="submit"  -->
+								<a class="btn btn-white-md" href="https://www.toastmasters.org/about/all-about-toastmasters">Learn more</a>
 							</div>
 						</form>
 					</div>
@@ -894,6 +1296,8 @@
 <!--====  End of Registration  ====-->
 
 
+
+
 <!--===================================
 =            Pricing Table            =
 ====================================-->
@@ -903,8 +1307,9 @@
 		<div class="row">
 			<div class="col-12">
 				<div class="section-title">
-					<h3>Get <span class="alternate">ticket</span></h3>
-					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit sed do eiusm tempor incididunt ut labore</p>
+					<!-- <h3>Get <span class="alternate">ticket</span></h3> -->
+					<h3>Become <span class="alternate">a Club Member</span></h3>
+					<p>Anyone interested in improving their public speaking, communication, and leadership skills is invited to visit our club meeting!</p>
 				</div>
 			</div>
 		</div>
@@ -915,21 +1320,27 @@
 					<div class="pricing-heading">
 						<!-- Title -->
 						<div class="title">
-							<h6>Starter</h6>
+							<h6>Guest</h6>
 						</div>
 						<!-- Price -->
 						<div class="price">
-							<h2>39.00<span>$</span></h2>
-							<p>/Person</p>
+							<h2>FREE<span></span></h2>
+							<p>Forever</p>
 						</div>
 					</div>
 					<div class="pricing-body">
 						<!-- Feature List -->
 						<ul class="feature-list m-0 p-0">
-							<li><p><span class="fa fa-check-circle available"></span>1 Comfortable Seats</p></li>
-							<li><p><span class="fa fa-check-circle available"></span>Free Lunch and Coffee</p></li>
-							<li><p><span class="fa fa-times-circle unavailable"></span>Certificate</p></li>
-							<li><p><span class="fa fa-times-circle unavailable"></span>Easy Access</p></li>
+							<li><p><span class="fa fa-times-circle unavailable"></span>Give a prepared speech</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Give an improv speech</p></li>
+               <!-- (TableTopics) -->
+							<li><p><span class="fa fa-times-circle unavailable"></span>Give an evluation speech</p></li>
+							<li><p><span class="fa fa-times-circle unavailable"></span>Mentorship program</p></li>
+							<li><p><span class="fa fa-times-circle unavailable"></span>Pathway Resources</p></li>
+              <li><p><span class="fa fa-times-circle unavailable"></span>Club Resources (Slack)</p></li>
+              <li><p><span class="fa fa-times-circle unavailable"></span>Toastmasters Competitions</p></li>
+							<li><p><span class="fa fa-times-circle unavailable"></span>Join any TM Club worldwide</p></li>
+							<li><p><span class="fa fa-times-circle unavailable"></span>TM Certificate</p></li>
 						</ul>
 					</div>
 					<div class="pricing-footer text-center">
@@ -943,21 +1354,29 @@
 					<div class="pricing-heading">
 						<!-- Title -->
 						<div class="title">
-							<h6>Standard</h6>
+							<h6>Member</h6>
 						</div>
 						<!-- Price -->
 						<div class="price">
-							<h2>49.00<span>$</span></h2>
-							<p>/Person</p>
+							<!-- <h2>11.67<span>$</span></h2> -->
+							<h2>8.33<span>$</span></h2>
+							<!-- <p>/Person</p> -->
+							<p>/Month</p>
+							<!-- <p>6 Month (New member fee $20 + Toastmaster Intl $45 + Local Club $5</p> -->
 						</div>
 					</div>
 					<div class="pricing-body">
 						<!-- Feature List -->
 						<ul class="feature-list m-0 p-0">
-							<li><p><span class="fa fa-check-circle available"></span>1 Comfortable Seats</p></li>
-							<li><p><span class="fa fa-check-circle available"></span>Free Lunch and Coffee</p></li>
-							<li><p><span class="fa fa-check-circle available"></span>Certificate</p></li>
-							<li><p><span class="fa fa-times-circle unavailable"></span>Easy Access</p></li>
+              <li><p><span class="fa fa-check-circle available"></span>Give a prepared speech</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Give an improv speech</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Give an evluation speech</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Mentorship program</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Pathway Resources</p></li>
+              <li><p><span class="fa fa-check-circle available"></span>Club Resources (Slack)</p></li>
+              <li><p><span class="fa fa-check-circle available"></span>Toastmasters Competitions</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>Join any TM Club worldwide</p></li>
+							<li><p><span class="fa fa-check-circle available"></span>TM Certificate</p></li>
 						</ul>
 					</div>
 					<div class="pricing-footer text-center">
@@ -965,22 +1384,27 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-6 m-auto">
-				<!-- Pricing Item -->
+      <div class="col-lg-4 col-md-6 m-auto">
+        <p class="pricing-heading">
+
+        <!-- <br/> -->
+        <!-- <br/> -->
+        Our club memberships run on a 6-month term, which these terms start April 1st & October 1st and are used to fund the local club ($5), Toastmaster Intl.($45), and a one-time new member fee ($20).
+        </p>
+      </div>
+			<!-- <div class="col-lg-4 col-md-6 m-auto">
 				<div class="pricing-item">
 					<div class="pricing-heading">
-						<!-- Title -->
 						<div class="title">
-							<h6>Platinum</h6>
+							<h6>Current Member</h6>
 						</div>
-						<!-- Price -->
 						<div class="price">
-							<h2>99.00<span>$</span></h2>
-							<p>/Person</p>
+							<h2>8.33<span>$</span></h2>
+							<p>/Month</p><br>
+							<p>6 Month (Toastmaster Intl $45 + Local Club $5</p>
 						</div>
 					</div>
 					<div class="pricing-body">
-						<!-- Feature List -->
 						<ul class="feature-list m-0 p-0">
 							<li><p><span class="fa fa-check-circle available"></span>1 Comfortable Seats</p></li>
 							<li><p><span class="fa fa-check-circle available"></span>Free Lunch and Coffee</p></li>
@@ -992,7 +1416,7 @@
 						<a href="#" class="btn btn-transparent-md">Buy a ticket</a>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </section>
@@ -1004,11 +1428,10 @@
 =            Call to Action Ticket            =
 ============================================-->
 
-<section class="cta-ticket bg-ticket overlay-dark">
+<!-- <section class="cta-ticket bg-ticket overlay-dark">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
-				<!-- Get ticket info -->
 				<div class="content-block">
 					<h2>Get Ticket <span class="alternate">Now!</span></h2>
 					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit sed do eiusmtempor incidi</p>
@@ -1018,7 +1441,7 @@
 		</div>
 	</div>
 	<div class="image-block"><img src="images/speakers/speaker-ticket.png" alt="" class="img-fluid"></div>
-</section>
+</section> -->
 
 <!--====  End of Call to Action Ticket  ====-->
 
@@ -1026,7 +1449,7 @@
 =            Sponsors            =
 ===============================-->
 
-<section class="sponsors section bg-sponsors overlay-white">
+<!-- <section class="sponsors section bg-sponsors overlay-white">
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
@@ -1038,12 +1461,10 @@
 		</div>
 		<div class="row">
 			<div class="col-12">
-				<!-- Title -->
 				<div class="sponsor-title text-center">
 					<h5>Platinum Sponsors</h5>
 				</div>
 				<div class="block text-center">
-					<!-- Sponsors image list -->
 					<ul class="list-inline sponsors-list">
 						<li class="list-inline-item">
 							<div class="image-block text-center">
@@ -1075,12 +1496,10 @@
 						</li>
 					</ul>
 				</div>
-				<!-- Title -->
 				<div class="sponsor-title text-center">
 					<h5>Gold Sponsors</h5>
 				</div>
 				<div class="block text-center">
-					<!-- Sponsors image list -->
 					<ul class="list-inline sponsors-list">
 						<li class="list-inline-item">
 							<div class="image-block text-center">
@@ -1111,7 +1530,7 @@
 			</div>
 		</div>
 	</div>
-</section>
+</section> -->
 
 <!--====  End of Sponsors  ====-->
 
@@ -1119,7 +1538,7 @@
 =            News Posts            =
 =================================-->
 
-<section class="news section">
+<!-- <section class="news section">
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
@@ -1231,7 +1650,7 @@
 			</div>
 		</div>
 	</div>
-</section>
+</section> -->
 
 <!--====  End of News Posts  ====-->
 
@@ -1241,7 +1660,7 @@
 =            Call to Action Subscribe            =
 ===============================================-->
 
-<section class="cta-subscribe bg-subscribe overlay-dark">
+<section id="subscribe" class="cta-subscribe bg-subscribe overlay-dark">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 mr-auto">
@@ -1270,12 +1689,12 @@
 
 <!--====  End of Call to Action Subscribe  ====-->
 
+
 <!--================================
 =            Google Map            =
 =================================-->
 
-<section class="map">
-	<!-- Google Map -->
+<!-- <section class="map">
 	<div id="map"></div>
 	<div class="address-block">
 		<h4>Docklands Convention</h4>
@@ -1285,7 +1704,7 @@
 		</ul>
 		<a href="#" class="btn btn-white-md">Get Direction</a>
 	</div>
-</section>
+</section> -->
 
 <!--====  End of Google Map  ====-->
 
@@ -1293,33 +1712,35 @@
 =            Footer            =
 =============================-->
 
-<footer class="footer-main">
+<footer class="footer-main" style="background-color: white">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
           <div class="block text-center">
+            UT Sciences Toastmasters
             <div class="footer-logo">
-              <img src="images/footer-logo.png" alt="logo" class="img-fluid">
+              <!-- <img src="images/footer-logo.png" alt="logo" class="img-fluid"> -->
+              <img src="images/logo.png" alt="logo" class="img-fluid">
             </div>
             <ul class="social-links-footer list-inline">
               <li class="list-inline-item">
-                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="https://www.facebook.com/groups/UTSTM"><i class="fa fa-facebook"></i></a>
               </li>
-              <li class="list-inline-item">
+              <!-- <li class="list-inline-item">
                 <a href="#"><i class="fa fa-twitter"></i></a>
-              </li>
+              </li> -->
               <li class="list-inline-item">
-                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="https://www.instagram.com/utsciencestoastmasters/?hl=en"><i class="fa fa-instagram"></i></a>
               </li>
-              <li class="list-inline-item">
+              <!-- <li class="list-inline-item">
                 <a href="#"><i class="fa fa-rss"></i></a>
               </li>
               <li class="list-inline-item">
                 <a href="#"><i class="fa fa-vimeo"></i></a>
-              </li>
+              </li> -->
             </ul>
           </div>
-          
+
         </div>
       </div>
     </div>
@@ -1330,7 +1751,7 @@
     <div class="row">
       <div class="col-md-6 align-self-center">
         <div class="copyright-text">
-          <p><a href="#">Eventre</a> &#169; 2017 All Right Reserved</p>
+          <p><a href="#">UT Sciences Toastmasters</a> &#169; 2021 All Right Reserved</p>
         </div>
       </div>
       <div class="col-md-6">
@@ -1349,13 +1770,13 @@
   <!-- Bootstrap 4 -->
   <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
   <!-- Smooth Scroll -->
-  <script src="plugins/smoothscroll/SmoothScroll.min.js"></script>  
+  <script src="plugins/smoothscroll/SmoothScroll.min.js"></script>
   <!-- Isotope -->
-  <script src="plugins/isotope/mixitup.min.js"></script>  
+  <script src="plugins/isotope/mixitup.min.js"></script>
   <!-- Magnific Popup -->
   <script src="plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
   <!-- Slick Carousel -->
-  <script src="plugins/slick/slick.min.js"></script>  
+  <script src="plugins/slick/slick.min.js"></script>
   <!-- SyoTimer -->
   <script src="plugins/syotimer/jquery.syotimer.min.js"></script>
   <!-- Google Mapl -->
@@ -1364,8 +1785,4 @@
   <!-- Custom Script -->
   <script src="js/custom.js"></script>
 </body>
-
 </html>
-
-
-

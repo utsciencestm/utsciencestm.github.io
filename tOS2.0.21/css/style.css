@@ -713,7 +713,8 @@ select.form-control:not([size]):not([multiple]) {
 .main-nav .ticket {
   background: #ff6600;
   display: block;
-  padding: 34px 32px;
+  /* padding: 34px 32px; */
+  padding: 10px 10px;
 }
 
 @media (max-width: 1200px) {
