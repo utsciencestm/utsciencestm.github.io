@@ -468,7 +468,7 @@ class SignupSheet extends SheetV4{
         if (short_name in this.members) {
           let fullname = this.members[short_name]['full_name'];
           result += `
-            <a href="/timeline.html?member=${short_name}">
+            <a href="https://utstm.github.io/timeline.html?member=${short_name}">
               ${fullname}
             </a><br/>`;
           this.assignedMembers.push(short_name)
